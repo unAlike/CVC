@@ -1,0 +1,9 @@
+name: Artid
+version: ${project.version}
+main: groupid.artid.Artid
+api-version: 1.16
+depend: [ProtocolLib]
+commands:
+  cvc:
+    description: CVC core
+    usage: /cvc
