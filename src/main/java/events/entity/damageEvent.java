@@ -13,7 +13,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 public class damageEvent implements Listener {
     @EventHandler
     public void explosion(EntityDamageEvent e){
-        if(e.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_EXPLOSION )){
+        if(e.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)){
             e.setCancelled(true);
         }
         if(e.getCause().equals(EntityDamageEvent.DamageCause.FALL)){

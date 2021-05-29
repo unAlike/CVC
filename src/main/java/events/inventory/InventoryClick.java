@@ -21,55 +21,71 @@ public class InventoryClick implements Listener {
         }
         if(e.getView().getTitle().equals("Weapon Selector")) {
             e.setCancelled(true);
-            p.player.getInventory().setItem(0, e.getCurrentItem());
 
-            switch (e.getCurrentItem().getType()) {
-                //////////////////////////////////////MAIN GUNS////////////////////////////
-                case NETHERITE_SWORD:
-                    p.setMain(new gun(20, 125, 10, 10, new ItemStack(Material.NETHERITE_SWORD,10), 10, 5, "snipershot01", "50 Cal", p.player));
-                    p.giveMainGun();
-                    break;
-                case GOLDEN_SHOVEL:
-
-                    break;
-                case STONE_SHOVEL:
-
-                    break;
-                case STONE_HOE:
-
-                    break;
-                case IRON_AXE:
-
-                    break;
-                case GOLDEN_AXE:
-
-                    break;
-                case DIAMOND_SHOVEL:
-
-                    break;
-                case WOODEN_AXE:
-
-                    break;
+            if(e.getCurrentItem().getType()!=null) {
+                switch (e.getCurrentItem().getType()) {
+                    //////////////////////////////////////MAIN GUNS////////////////////////////
+                    case NETHERITE_SWORD:
+                        p.setMain(new gun(20, 125, 10, 10, new ItemStack(Material.NETHERITE_SWORD, 10), 10, 5, "snipershot", "50 Cal", p.player));
+                        p.giveMainGun();
+                        e.setCancelled(true);
+                        break;
+                    case GOLDEN_SHOVEL:
+                        p.player.sendMessage("Not Implemented yet");
+                        e.setCancelled(true);
+                        break;
+                    case STONE_SHOVEL:
+                        p.player.sendMessage("Not Implemented yet");
+                        e.setCancelled(true);
+                        break;
+                    case STONE_HOE:
+                        p.player.sendMessage("Not Implemented yet");
+                        e.setCancelled(true);
+                        break;
+                    case IRON_AXE:
+                        p.player.sendMessage("Not Implemented yet");
+                        e.setCancelled(true);
+                        break;
+                    case GOLDEN_AXE:
+                        p.player.sendMessage("Not Implemented yet");
+                        e.setCancelled(true);
+                        break;
+                    case DIAMOND_SHOVEL:
+                        p.player.sendMessage("Not Implemented yet");
+                        e.setCancelled(true);
+                        break;
+                    case WOODEN_AXE:
+                        p.player.sendMessage("Not Implemented yet");
+                        e.setCancelled(true);
+                        break;
                     /////////////////////////////////PISTOLS/////////////////////////////
-                case WOODEN_PICKAXE:
-                case STONE_PICKAXE:
-                case GOLDEN_PICKAXE:
-                    e.getWhoClicked().getInventory().setItem(1, e.getCurrentItem());
-                    e.setCancelled(true);
-                    break;
+                    case WOODEN_PICKAXE:
+                        p.setOffhand(new gun(6, 20, 13, 13, new ItemStack(Material.WOODEN_PICKAXE, 13), 5, 1, "mcgo.weapons.pistolshot", "USP", p.player));
+                        p.giveOffhandGun();
+                        e.setCancelled(true);
+                        break;
+                    case STONE_PICKAXE:
+                        p.player.sendMessage("Not Implemented yet");
+                        e.setCancelled(true);
+                        break;
+                    case GOLDEN_PICKAXE:
+                        p.player.sendMessage("Not Implemented yet");
+                        e.setCancelled(true);
+                        break;
                     ////////////////////////////DMG NADES////////////////////////////////
-                case ACACIA_SAPLING:
-                case OAK_SAPLING:
-                    e.getWhoClicked().getInventory().setItem(3, e.getCurrentItem());
-                    e.setCancelled(true);
-                    break;
+                    case ACACIA_SAPLING:
+                    case OAK_SAPLING:
+                        e.getWhoClicked().getInventory().setItem(3, e.getCurrentItem());
+                        e.setCancelled(true);
+                        break;
                     //////////////////////////////////UTIL NADES///////////////////////////
-                case JUNGLE_SAPLING:
-                case DARK_OAK_SAPLING:
-                case BIRCH_SAPLING:
-                    e.getWhoClicked().getInventory().setItem(4, e.getCurrentItem());
-                    e.setCancelled(true);
-                    break;
+                    case JUNGLE_SAPLING:
+                    case DARK_OAK_SAPLING:
+                    case BIRCH_SAPLING:
+                        e.getWhoClicked().getInventory().setItem(4, e.getCurrentItem());
+                        e.setCancelled(true);
+                        break;
+                }
             }
         }
     }

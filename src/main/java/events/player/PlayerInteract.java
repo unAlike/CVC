@@ -3,6 +3,7 @@ package events.player;
 import groupid.artid.Artid;
 import groupid.artid.mcgoPlayer;
 import inventories.shop;
+import org.bukkit.Art;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
@@ -58,6 +59,12 @@ public class PlayerInteract implements Listener {
                         e.setCancelled(true);
 
                         break;
+                        //############################ PISTOLS #########################################################
+                    case WOODEN_PICKAXE:
+                        e.setCancelled(true);
+                        p.getOffhand().shoot();
+                        p.getOffhand().printStats();
+                        break;
 //#################################################### START GRENADES ##################################################
                     case OAK_SAPLING:
                         throwNade(e, e.getPlayer(), Material.OAK_SAPLING);
@@ -112,6 +119,9 @@ public class PlayerInteract implements Listener {
                     case WOODEN_AXE:
 
                         break;
+                case WOODEN_PICKAXE:
+                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getOffhand().reload();
+                    break;
                     case OAK_SAPLING: case BIRCH_SAPLING: case DARK_OAK_SAPLING: case ACACIA_SAPLING: case JUNGLE_SAPLING:
                         if(e.getPlayer().getExp()+.24999 >= 1){
                             e.getPlayer().setExp(0.00000000000000000001f);

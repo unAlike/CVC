@@ -1,8 +1,10 @@
 package projectile;
 
+import groupid.artid.Artid;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -51,7 +53,15 @@ public class rayTracer {
 
             Block block = world.getBlockAt((int)Math.floor(pos.getX()),(int)Math.floor(pos.getY()),(int)Math.floor(pos.getZ()));
             switch (block.getType()){
-                case OAK_LOG: case COAL_ORE: case OAK_LEAVES:
+                case OAK_LOG: case COAL_ORE: case OAK_LEAVES: case IRON_ORE: case DIAMOND_ORE: case ACACIA_LEAVES: case BIRCH_LEAVES: case DARK_OAK_LEAVES: case SPRUCE_LEAVES:
+                case WHITE_STAINED_GLASS_PANE: case GLASS_PANE:
+                    Material type = block.getType();
+                    new BukkitRunnable(){
+                        @Override
+                        public void run() {
+                            block.setType(type);
+                        }
+                    }.runTaskLater(Artid.plug, 20);
                     block.setType(Material.AIR);
                 default:
                     return positions;

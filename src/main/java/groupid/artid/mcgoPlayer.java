@@ -35,4 +35,5 @@ public class mcgoPlayer {
     public void giveMainGun(){
         player.getInventory().setItem(0, main.getItem());
     }
+    public void giveOffhandGun(){player.getInventory().setItem(1, offhand.getItem());}
 }

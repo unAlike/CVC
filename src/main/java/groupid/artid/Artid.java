@@ -2,6 +2,7 @@ package groupid.artid;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import events.block.blockBreak;
 import events.block.physics;
 import events.entity.entityHit;
 import events.entity.damageEvent;
@@ -71,6 +72,7 @@ public final class Artid extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new physics(), this);
         getServer().getPluginManager().registerEvents(new damageEvent(), this);
         getServer().getPluginManager().registerEvents(new playerDropItem(), this);
+        getServer().getPluginManager().registerEvents(new blockBreak(), this);
         //getServer().getPluginManager().registerEvents(new pickupItem(), this);
 
         //Register Commands
