@@ -33,37 +33,16 @@ public class PlayerInteract implements Listener {
 
                         e.getPlayer().openInventory(shop.getInv());
                         break;
-                    case NETHERITE_SWORD:
-                        e.setCancelled(true);
-                        p.getMain().printStats();
-                        p.getMain().shoot();
-
-                        break;
-                    case WOODEN_AXE:
+                        //########################## HEAVY GUNS #######################################################
+                    case NETHERITE_SWORD: case IRON_AXE: case STONE_SHOVEL:
                         e.setCancelled(true);
 
                         break;
-                    case NETHERITE_SHOVEL:
-                        e.setCancelled(true);
 
-                        break;
-                    case STONE_SHOVEL:
-                        e.setCancelled(true);
-
-                        break;
-                    case DIAMOND_HOE:
-                        e.setCancelled(true);
-
-                        break;
-                    case GOLDEN_AXE:
-                        e.setCancelled(true);
-
-                        break;
                         //############################ PISTOLS #########################################################
                     case WOODEN_PICKAXE:
                         e.setCancelled(true);
                         p.getOffhand().shoot();
-                        p.getOffhand().printStats();
                         break;
 //#################################################### START GRENADES ##################################################
                     case OAK_SAPLING:
@@ -115,13 +94,19 @@ public class PlayerInteract implements Listener {
     public void animationEvent(PlayerAnimationEvent e){
         if(e.getAnimationType().equals(PlayerAnimationType.ARM_SWING)){
             e.setCancelled(true);
+
             switch(e.getPlayer().getInventory().getItemInMainHand().getType()){
                     case WOODEN_AXE:
 
                         break;
-                case WOODEN_PICKAXE:
+                case IRON_AXE:
+                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain().reload();
+                    break;
+                        /////////////////PISTOLS////////////////////////////
+                case WOODEN_PICKAXE: case STONE_PICKAXE: case GOLDEN_PICKAXE:
                     Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getOffhand().reload();
                     break;
+                    //////////////////////////NADES//////////////////////////////
                     case OAK_SAPLING: case BIRCH_SAPLING: case DARK_OAK_SAPLING: case ACACIA_SAPLING: case JUNGLE_SAPLING:
                         if(e.getPlayer().getExp()+.24999 >= 1){
                             e.getPlayer().setExp(0.00000000000000000001f);

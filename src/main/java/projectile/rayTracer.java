@@ -54,7 +54,7 @@ public class rayTracer {
             Block block = world.getBlockAt((int)Math.floor(pos.getX()),(int)Math.floor(pos.getY()),(int)Math.floor(pos.getZ()));
             switch (block.getType()){
                 case OAK_LOG: case COAL_ORE: case OAK_LEAVES: case IRON_ORE: case DIAMOND_ORE: case ACACIA_LEAVES: case BIRCH_LEAVES: case DARK_OAK_LEAVES: case SPRUCE_LEAVES:
-                case WHITE_STAINED_GLASS_PANE: case GLASS_PANE:
+                case WHITE_STAINED_GLASS_PANE: case GLASS_PANE: case HAY_BLOCK: case GLASS:
                     Material type = block.getType();
                     new BukkitRunnable(){
                         @Override
@@ -63,15 +63,24 @@ public class rayTracer {
                         }
                     }.runTaskLater(Artid.plug, 20);
                     block.setType(Material.AIR);
-                default:
-                    return positions;
 
+                default:
+                    if(block.getBoundingBox().contains(pos.getX(),pos.getY(),pos.getZ())) return positions;
                 case AIR:
                 case CAVE_AIR:
                 case WATER:
                 case GRASS:
                 case TALL_GRASS:
                 case SNOW:
+                case FIRE:
+                case WHEAT:
+                case BARRIER:
+                case SPRUCE_SIGN:
+                case OAK_SIGN:
+                case BIRCH_SIGN:
+                case JUNGLE_SIGN:
+                case DARK_OAK_SIGN:
+
 
 
             }

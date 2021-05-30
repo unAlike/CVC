@@ -35,7 +35,8 @@ public class InventoryClick implements Listener {
                         e.setCancelled(true);
                         break;
                     case STONE_SHOVEL:
-                        p.player.sendMessage("Not Implemented yet");
+                        p.setMain(new gun(1, 10, 40, 40, new ItemStack(Material.STONE_SHOVEL, 40), 5, 7, "mcgo.weapons.smgshot", "MP5", p.player));
+                        p.giveMainGun();
                         e.setCancelled(true);
                         break;
                     case STONE_HOE:
@@ -43,7 +44,8 @@ public class InventoryClick implements Listener {
                         e.setCancelled(true);
                         break;
                     case IRON_AXE:
-                        p.player.sendMessage("Not Implemented yet");
+                        p.setMain(new gun(2, 36, 30, 30, new ItemStack(Material.IRON_AXE, 30), 10, 5, "mcgo.weapons.carbineshot", "M4", p.player));
+                        p.giveMainGun();
                         e.setCancelled(true);
                         break;
                     case GOLDEN_AXE:

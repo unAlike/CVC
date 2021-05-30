@@ -20,6 +20,7 @@ import runnables.molly;
 import runnables.nadeBlow;
 
 public class entityHit implements Listener {
+    final float bounce =.5f;
     Material lastMaterial;
     boolean molley = false;
     @EventHandler
@@ -138,18 +139,18 @@ public class entityHit implements Listener {
 
                     switch (e.getHitBlockFace()) {
                         default:
-                            ball.setVelocity(new Vector(e.getEntity().getVelocity().getX() * -.8, e.getEntity().getVelocity().getY(), e.getEntity().getVelocity().getZ() * -.8));
+                            ball.setVelocity(new Vector(e.getEntity().getVelocity().getX() * -bounce, e.getEntity().getVelocity().getY(), e.getEntity().getVelocity().getZ() * -bounce));
                         case UP:
                         case DOWN:
-                            ball.setVelocity(new Vector(e.getEntity().getVelocity().getX(), e.getEntity().getVelocity().getY() * -.8, e.getEntity().getVelocity().getZ()));
+                            ball.setVelocity(new Vector(e.getEntity().getVelocity().getX(), e.getEntity().getVelocity().getY() * -bounce, e.getEntity().getVelocity().getZ()));
                             break;
                         case EAST:
                         case WEST:
-                            ball.setVelocity(new Vector(e.getEntity().getVelocity().getX() * -.8, e.getEntity().getVelocity().getY(), e.getEntity().getVelocity().getZ()));
+                            ball.setVelocity(new Vector(e.getEntity().getVelocity().getX() * -bounce, e.getEntity().getVelocity().getY(), e.getEntity().getVelocity().getZ()));
                             break;
                         case NORTH:
                         case SOUTH:
-                            ball.setVelocity(new Vector(e.getEntity().getVelocity().getX(), e.getEntity().getVelocity().getY(), e.getEntity().getVelocity().getZ() * -.8));
+                            ball.setVelocity(new Vector(e.getEntity().getVelocity().getX(), e.getEntity().getVelocity().getY(), e.getEntity().getVelocity().getZ() * -bounce));
 
                     }
                 }

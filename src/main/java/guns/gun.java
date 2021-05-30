@@ -28,6 +28,7 @@ public class gun {
     float recoil;
     boolean cooldown = false;
     int recoilCount = 0;
+
     public gun(){
 
     }
@@ -50,6 +51,7 @@ public class gun {
             }
         }.runTaskTimer(Artid.plug, 0,1);
     }
+
     public void shoot(){
         if(!cooldown) {
             cooldown = true;
@@ -83,7 +85,7 @@ public class gun {
                             ((LivingEntity) ent).damage(damage/5);
                             ((LivingEntity) ent).setNoDamageTicks(0);
                             w.playSound(loc, soundEffect, 1f, 1f);
-                            w.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+                            w.playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
                             if (ent.isDead()) {
                                 p.getPlayer().sendMessage(ChatColor.BOLD + (ChatColor.AQUA + p.getPlayer().getName() + ChatColor.WHITE + " 銈銉 " + ChatColor.GREEN + ent.getName()));
                                 w.playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);

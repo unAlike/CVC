@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 
@@ -24,6 +25,9 @@ public class damageEvent implements Listener {
             e.setDamage(4);
             e.getEntity().setFireTicks(0);
         }
-
+    }
+    @EventHandler
+    public void EntityDamageEnt(EntityDamageByEntityEvent e){
+        if(e.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) e.setCancelled(true);
     }
 }

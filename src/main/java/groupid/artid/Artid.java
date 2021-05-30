@@ -2,7 +2,6 @@ package groupid.artid;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import events.block.blockBreak;
 import events.block.physics;
 import events.entity.entityHit;
 import events.entity.damageEvent;
@@ -26,12 +25,21 @@ public final class Artid extends JavaPlugin implements Listener {
     public static HashMap<Player, Integer> shots;
     public static ProtocolManager protocolManager;
     public static HashMap<String, mcgoPlayer> mcPlayers;
+    public static HashMap<String, String> isShooting;
 
     @Override
     public void onEnable() {
         plug = this;
         shots = new HashMap<Player, Integer>();
         mcPlayers = new HashMap<String, mcgoPlayer>();
+        isShooting = new HashMap<String, String>();
+        // FOR SHOOTING RESET
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                isShooting.clear();
+            }
+        }.runTaskTimer(this,0,5);
         for(Player p : this.getServer().getOnlinePlayers()){
             mcPlayers.put(p.getUniqueId().toString(), new mcgoPlayer(p));
             p.setGameMode(GameMode.ADVENTURE);
@@ -48,6 +56,8 @@ public final class Artid extends JavaPlugin implements Listener {
             w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
             w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
             w.setGameRule(GameRule.NATURAL_REGENERATION, false);
+            w.setGameRule(GameRule.RANDOM_TICK_SPEED, 0);
+            w.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
             w.setTime(6000);
         }
         BukkitRunnable ad = new adventure();
@@ -72,7 +82,8 @@ public final class Artid extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new physics(), this);
         getServer().getPluginManager().registerEvents(new damageEvent(), this);
         getServer().getPluginManager().registerEvents(new playerDropItem(), this);
-        getServer().getPluginManager().registerEvents(new blockBreak(), this);
+        getServer().getPluginManager().registerEvents(new playerSleep(), this);
+        //getServer().getPluginManager().registerEvents(new blockBreak(), this);
         //getServer().getPluginManager().registerEvents(new pickupItem(), this);
 
         //Register Commands
