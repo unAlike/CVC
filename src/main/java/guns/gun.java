@@ -1,5 +1,6 @@
 package guns;
 
+import com.mysql.jdbc.Buffer;
 import groupid.artid.Artid;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
@@ -7,6 +8,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import projectile.rayTracer;
 import java.util.UUID;
@@ -14,6 +16,7 @@ import java.util.function.BiConsumer;
 
 public class gun {
     int fireRate;
+    float reloadTime;
     float damage;
     int maxAmmo;
     int ammo;
@@ -32,8 +35,9 @@ public class gun {
     public gun(){
 
     }
-    public gun(int fireRate, float damage, int maxAmmo, int ammo, ItemStack item, float maxRecoil, float spread, String soundEffect, String name, Player p){
+    public gun(int fireRate, float reloadTime, float damage, int maxAmmo, int ammo, ItemStack item, float maxRecoil, float spread, String soundEffect, String name, Player p){
         this.fireRate = fireRate;
+        this.reloadTime = reloadTime;
         this.damage = damage;
         this.maxAmmo = maxAmmo;
         this.ammo = ammo;
@@ -97,14 +101,38 @@ public class gun {
                     this.recoil += .5;
                 }
                 recoilCount = 20;
-
+                if(ammo<1){
+                    reload();
+                }
             }
         }
     }
     public void reload(){
-        ammo = maxAmmo;
-        item.setAmount(ammo);
-        Bukkit.getPlayer(playerUUID).getInventory().setItemInMainHand(item);
+//        ammo = maxAmmo;
+        short step = (short)(100/this.reloadTime);
+//        item.setAmount(ammo);
+//        Bukkit.getPlayer(playerUUID).getInventory().setItemInMainHand(item);
+        new BukkitRunnable(){
+            int counter = 0;
+            @Override
+            public void run() {
+                if(Bukkit.getPlayer(playerUUID).getInventory().getItemInMainHand().equals(item)){
+                    switch(counter){
+                        case 0:
+                            Bukkit.getPlayer(playerUUID).sendMessage("Counter at: 0" + counter);
+
+                            break;
+                        case 1:
+                            Bukkit.getPlayer(playerUUID).sendMessage("Counter at: 0" + counter);
+                            this.cancel();
+                            break;
+                    }
+                    counter++;
+                }
+            }
+        }.runTaskTimer(Artid.plug, 0, (long)this.reloadTime/10);
+
+
     }
     public void printStats(){
         Bukkit.getPlayer(playerUUID).sendMessage("Ammo: "+ammo +"\nMax Ammo: "+maxAmmo+"\nDamage: "+damage);

@@ -26,7 +26,7 @@ public class InventoryClick implements Listener {
                 switch (e.getCurrentItem().getType()) {
                     //////////////////////////////////////MAIN GUNS////////////////////////////
                     case NETHERITE_SWORD:
-                        p.setMain(new gun(20, 125, 10, 10, new ItemStack(Material.NETHERITE_SWORD, 10), 10, 5, "snipershot", "50 Cal", p.player));
+                        p.setMain(new gun(20, 60, 125, 10, 10, new ItemStack(Material.NETHERITE_SWORD, 10), 10, 5, "snipershot", "50 Cal", p.player));
                         p.giveMainGun();
                         e.setCancelled(true);
                         break;
@@ -35,7 +35,7 @@ public class InventoryClick implements Listener {
                         e.setCancelled(true);
                         break;
                     case STONE_SHOVEL:
-                        p.setMain(new gun(1, 10, 40, 40, new ItemStack(Material.STONE_SHOVEL, 40), 5, 7, "mcgo.weapons.smgshot", "MP5", p.player));
+                        p.setMain(new gun(1, 40, 10, 40, 40, new ItemStack(Material.STONE_SHOVEL, 40), 5, 7, "mcgo.weapons.smgshot", "MP5", p.player));
                         p.giveMainGun();
                         e.setCancelled(true);
                         break;
@@ -44,7 +44,7 @@ public class InventoryClick implements Listener {
                         e.setCancelled(true);
                         break;
                     case IRON_AXE:
-                        p.setMain(new gun(2, 36, 30, 30, new ItemStack(Material.IRON_AXE, 30), 10, 5, "mcgo.weapons.carbineshot", "M4", p.player));
+                        p.setMain(new gun(2, 40, 36, 30, 30, new ItemStack(Material.IRON_AXE, 30), 10, 5, "mcgo.weapons.carbineshot", "M4", p.player));
                         p.giveMainGun();
                         e.setCancelled(true);
                         break;
@@ -62,7 +62,7 @@ public class InventoryClick implements Listener {
                         break;
                     /////////////////////////////////PISTOLS/////////////////////////////
                     case WOODEN_PICKAXE:
-                        p.setOffhand(new gun(6, 20, 13, 13, new ItemStack(Material.WOODEN_PICKAXE, 13), 5, 1, "mcgo.weapons.pistolshot", "USP", p.player));
+                        p.setOffhand(new gun(6, 30, 20, 13, 13, new ItemStack(Material.WOODEN_PICKAXE, 13), 2.5f, 1, "mcgo.weapons.pistolshot", "USP", p.player));
                         p.giveOffhandGun();
                         e.setCancelled(true);
                         break;

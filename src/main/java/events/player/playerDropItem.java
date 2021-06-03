@@ -11,7 +11,9 @@ public class playerDropItem implements Listener {
             case GHAST_TEAR:
                 e.setCancelled(true);
                 break;
-
+            case WOODEN_PICKAXE:
+                e.setCancelled(true);
+                e.getPlayer().getInventory().getItemInMainHand().setAmount(0);
         }
     }
 }

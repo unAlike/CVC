@@ -3,9 +3,13 @@ package events.player;
 import groupid.artid.Artid;
 import groupid.artid.mcgoPlayer;
 import inventories.shop;
+import net.minecraft.server.v1_16_R3.EntitySnowball;
 import org.bukkit.Art;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftSnowball;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -19,6 +23,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
+import org.bukkit.util.Vector;
+
+import java.util.Set;
 
 public class PlayerInteract implements Listener {
     @EventHandler
@@ -92,7 +99,9 @@ public class PlayerInteract implements Listener {
     }
     @EventHandler
     public void animationEvent(PlayerAnimationEvent e){
-        if(e.getAnimationType().equals(PlayerAnimationType.ARM_SWING)){
+
+        Block focused = e.getPlayer().getTargetBlock((Set<Material>) null, 5);
+        if(e.getAnimationType() == PlayerAnimationType.ARM_SWING && focused.getType() == Material.AIR) {
             e.setCancelled(true);
 
             switch(e.getPlayer().getInventory().getItemInMainHand().getType()){
@@ -141,6 +150,6 @@ public class PlayerInteract implements Listener {
         as.setCollidable(false);
         as.getEquipment().setItemInMainHand(item);
         ball.addPassenger(as);
-        ball.setVelocity(e.getPlayer().getLocation().getDirection().multiply(e.getPlayer().getExp()*1.25));
+        ball.setVelocity(e.getPlayer().getLocation().getDirection().multiply(e.getPlayer().getExp()*1.25).add(e.getPlayer().getVelocity()));
     }
 }

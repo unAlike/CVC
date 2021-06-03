@@ -48,18 +48,18 @@ public final class Artid extends JavaPlugin implements Listener {
                 p.getInventory().setItem(8,new ItemStack(Material.GHAST_TEAR));
             }
         }
-        for(World w : Bukkit.getWorlds()){
-            w.setGameRule(GameRule.DO_FIRE_TICK, false);
-            w.setGameRule(GameRule.KEEP_INVENTORY, true);
-            w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-            w.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
-            w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
-            w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-            w.setGameRule(GameRule.NATURAL_REGENERATION, false);
-            w.setGameRule(GameRule.RANDOM_TICK_SPEED, 0);
-            w.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
-            w.setTime(6000);
-        }
+//        for(World w : Bukkit.getWorlds()){
+//            w.setGameRule(GameRule.DO_FIRE_TICK, false);
+//            w.setGameRule(GameRule.KEEP_INVENTORY, true);
+//            w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+//            w.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
+//            w.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+//            w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+//            w.setGameRule(GameRule.NATURAL_REGENERATION, false);
+//            w.setGameRule(GameRule.RANDOM_TICK_SPEED, 0);
+//            w.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+//            w.setTime(6000);
+//        }
         BukkitRunnable ad = new adventure();
         BukkitRunnable runner = new scheduler();
         BukkitRunnable nades = new nadeBlow();

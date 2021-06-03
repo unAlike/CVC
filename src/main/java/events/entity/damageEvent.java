@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.util.Vector;
 
 
 public class damageEvent implements Listener {
@@ -16,6 +17,7 @@ public class damageEvent implements Listener {
     public void explosion(EntityDamageEvent e){
         if(e.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)){
             e.setCancelled(true);
+            e.getEntity().getVelocity().setY(0);
         }
         if(e.getCause().equals(EntityDamageEvent.DamageCause.FALL)){
             e.setCancelled(true);

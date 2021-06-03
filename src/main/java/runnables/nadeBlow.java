@@ -30,7 +30,9 @@ public class nadeBlow extends BukkitRunnable {
                             flash(ar,w);
                             break;
                         case DARK_OAK_SAPLING:
-                            smoke(ar,w);
+                            if(ar.getTicksLived()>=55) {
+                                smoke(ar, w);
+                            }
                             break;
                         case JUNGLE_SAPLING:
                             decoy(ar,w);
@@ -54,7 +56,8 @@ public class nadeBlow extends BukkitRunnable {
         Location Loc = ar.getLocation();
         if(ar.getVehicle()!=null) ar.getVehicle().remove();
         ar.remove();
-        w.createExplosion(Loc, 4, false, false);
+        ar.getWorld().playSound(ar.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+        ar.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, ar.getLocation(), 1);
         for(Entity e : Loc.getWorld().getNearbyEntities(Loc,14,10,14)){
             if(e instanceof Player) {
                 if (e.getLocation().distance(Loc) < 7) {
