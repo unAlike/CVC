@@ -108,7 +108,9 @@ public class entityHit implements Listener {
 
                 }
                 if (!molley) {
-
+                    if(lastMaterial==null){
+                        return;
+                    }
                     ItemStack item = new ItemStack(lastMaterial);
                     ball.setShooter(e.getEntity().getShooter());
                     ball.setTicksLived(e.getEntity().getTicksLived());

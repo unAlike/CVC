@@ -12,12 +12,32 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class playerChangeItem implements Listener {
     @EventHandler
     public void changeItem(PlayerItemHeldEvent e){
+        mcgoPlayer mplayer = Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString());
+        if(e.getNewSlot()==0 && mplayer.getMain()!=null){
+            mplayer.getMain().setCooldown(true);
+            new BukkitRunnable(){
+                @Override
+                public void run() {
+                    mplayer.getMain().setCooldown(false);
+                }
+            }.runTaskLater(Artid.plug, ((long) mplayer.getMain().getFireRate()));
+        }
+        if(e.getNewSlot()==1 && mplayer.getOffhand()!=null){
+            mplayer.getOffhand().setCooldown(true);
+            new BukkitRunnable(){
+                @Override
+                public void run() {
+                    mplayer.getOffhand().setCooldown(false);
+                }
+            }.runTaskLater(Artid.plug, ((long) mplayer.getOffhand().getFireRate()));
+        }
         if(e.getPlayer().getInventory().getItem(e.getNewSlot()) != null) {
             switch (e.getPlayer().getInventory().getItem(e.getNewSlot()).getType()) {
                 default:

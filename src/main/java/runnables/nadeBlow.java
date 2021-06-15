@@ -56,7 +56,7 @@ public class nadeBlow extends BukkitRunnable {
         Location Loc = ar.getLocation();
         if(ar.getVehicle()!=null) ar.getVehicle().remove();
         ar.remove();
-        ar.getWorld().playSound(ar.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+        ar.getWorld().playSound(ar.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 5, 1);
         ar.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, ar.getLocation(), 1);
         for(Entity e : Loc.getWorld().getNearbyEntities(Loc,14,10,14)){
             if(e instanceof Player) {
@@ -69,7 +69,7 @@ public class nadeBlow extends BukkitRunnable {
     }
     public static void smoke(ArmorStand ar, World w){
         BukkitRunnable scheduler = new smokeAnimation(ar);
-        w.playSound(ar.getLocation(), "mcgo.throwables.explodesmoke", 1f, 1f);
+        w.playSound(ar.getLocation(), "mcgo.throwables.explodesmoke", 5f, 1f);
         scheduler.runTaskTimer(Artid.plug, 0, 5);
         if(ar.getVehicle()!=null) ar.getVehicle().remove();
         ar.remove();
@@ -81,7 +81,7 @@ public class nadeBlow extends BukkitRunnable {
         fm.setPower(0);
         f.setFireworkMeta(fm);
         f.detonate();
-        ar.getWorld().playSound(ar.getLocation(), "mcgo.throwables.explodeflashbang", 1, 1);
+        ar.getWorld().playSound(ar.getLocation(), "mcgo.throwables.explodeflashbang", 5, 1);
         for(Player player : ar.getWorld().getPlayers()){
 
         }

@@ -18,7 +18,7 @@ public class decoyNoise extends BukkitRunnable {
             this.cancel();
             ar.remove();
         }else{
-            ar.getWorld().playSound(ar.getLocation(), sound, 1,1);
+            ar.getWorld().playSound(ar.getLocation(), sound, 5,1);
             ar.getWorld().playEffect(ar.getLocation(), Effect.SMOKE, 1);
         }
 

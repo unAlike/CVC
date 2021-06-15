@@ -16,11 +16,14 @@ public class commands implements CommandExecutor {
             if(args.length==1) {
                 switch(args[0]){
                     default:
-                        p.sendMessage("Unknown Command");
+                        p.sendMessage("Unknown Command\n'/cvc hub' to return to hub");
+                        break;
                     case "hub":
                         p.getInventory().clear();
                         p.teleport(new Location(Bukkit.getWorld("world"), 0.5, 63, 0.5));
                         break;
+                    case "reset": case "r":
+
                 }
             }
         }

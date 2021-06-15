@@ -16,10 +16,10 @@ public class playerJoin implements Listener{
     @EventHandler
     public void playerJoinEvent(PlayerJoinEvent e){
         Artid.mcPlayers.put(e.getPlayer().getUniqueId().toString(), new mcgoPlayer(e.getPlayer()));
-        e.getPlayer().setGameMode(GameMode.ADVENTURE);
+        e.getPlayer().setGameMode(GameMode.SURVIVAL);
         e.getPlayer().teleport(new Location(Bukkit.getWorld("world"), 0.5,63,0.5));
         Bukkit.getConsoleSender().sendMessage(e.getPlayer().getDisplayName() + " joined!");
-        e.getPlayer().setGameMode(GameMode.ADVENTURE);
+        if(e.getPlayer().getGameMode()!=GameMode.CREATIVE) e.getPlayer().setGameMode(GameMode.SURVIVAL);
         e.getPlayer().getInventory().clear();
 
 

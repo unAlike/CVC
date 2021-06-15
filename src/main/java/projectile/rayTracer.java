@@ -1,21 +1,37 @@
 package projectile;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.PacketContainer;
 import groupid.artid.Artid;
+import net.minecraft.server.v1_16_R3.BlockPosition;
+import net.minecraft.server.v1_16_R3.PacketPlayOutBlockBreakAnimation;
+import net.minecraft.server.v1_16_R3.Position;
+import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class rayTracer {
 
     //origin = start position
     //direction = direction in which the raytrace will go
     Vector origin, direction;
+    Vector posit;
+    int walls = 0;
 
     public rayTracer(Vector origin, Vector direction) {
         this.origin = origin;
@@ -53,8 +69,8 @@ public class rayTracer {
             Vector pos = getPosition(d);
             Block block = world.getBlockAt((int)Math.floor(pos.getX()),(int)Math.floor(pos.getY()),(int)Math.floor(pos.getZ()));
             switch (block.getType()){
-                case OAK_LOG: case COAL_ORE: case OAK_LEAVES: case IRON_ORE: case DIAMOND_ORE: case ACACIA_LEAVES: case BIRCH_LEAVES: case DARK_OAK_LEAVES: case SPRUCE_LEAVES:
-                case WHITE_STAINED_GLASS_PANE: case GLASS_PANE: case HAY_BLOCK: case GLASS:
+                case COAL_ORE: case OAK_LEAVES: case IRON_ORE: case DIAMOND_ORE: case ACACIA_LEAVES: case BIRCH_LEAVES: case DARK_OAK_LEAVES: case SPRUCE_LEAVES:
+                case WHITE_STAINED_GLASS_PANE: case GLASS_PANE: case HAY_BLOCK: case GLASS: case EMERALD_ORE: case JUNGLE_LEAVES: case WHITE_STAINED_GLASS: case LIGHT_GRAY_STAINED_GLASS_PANE:
                     Material type;
                     type = block.getType();
                     new BukkitRunnable(){
@@ -62,31 +78,61 @@ public class rayTracer {
                         public void run() {
                             block.setType(type);
                         }
-                    }.runTaskLater(Artid.plug, 20);
-                    block.setType(Material.AIR);
+                    }.runTaskLater(Artid.plug, 200);
+                    new BukkitRunnable(){
+                        @Override
+                        public void run() {
+                            block.setType(Material.AIR);
+                        }
+                    }.runTask(Artid.plug);
                     positions.subList(0, positions.size()-2);
                     break outer;
 
                 default:
                     if(block.getBoundingBox().contains(pos.getX(),pos.getY(),pos.getZ())) return positions;
-                case AIR:
-                case CAVE_AIR:
-                case WATER:
-                case GRASS:
-                case TALL_GRASS:
-                case SNOW:
-                case FIRE:
-                case WHEAT:
-                case BARRIER:
-                case SPRUCE_SIGN:
-                case OAK_SIGN:
-                case BIRCH_SIGN:
-                case JUNGLE_SIGN:
-                case DARK_OAK_SIGN:
+                case ACACIA_LOG: case BIRCH_LOG: case DARK_OAK_LOG: case OAK_LOG: case JUNGLE_LOG: case SPRUCE_LOG: case ACACIA_PLANKS: case BIRCH_PLANKS: case CRIMSON_PLANKS:
+                case DARK_OAK_PLANKS: case OAK_PLANKS: case JUNGLE_PLANKS: case SPRUCE_PLANKS: case JUNGLE_WOOD: case ACACIA_WOOD: case BIRCH_WOOD: case DARK_OAK_WOOD:
+                case OAK_WOOD: case SPRUCE_WOOD: case STRIPPED_ACACIA_WOOD: case STRIPPED_BIRCH_WOOD: case STRIPPED_DARK_OAK_WOOD: case STRIPPED_JUNGLE_WOOD: case STRIPPED_OAK_WOOD:
+                case STRIPPED_SPRUCE_WOOD: case SPRUCE_SLAB: case BIRCH_SLAB: case DARK_OAK_SLAB: case ACACIA_SLAB: case JUNGLE_SLAB:
+                    walls++;
+                    new BukkitRunnable(){
+                        @Override
+                        public void run() {
+                            PacketContainer packet1 = Artid.protocolManager.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
+                            packet1.getIntegers().write(0, new Random().nextInt(2000)); //entityid
+                            packet1.getIntegers().write(1, 9); //stage
+
+                            try {
+                                for(Player p : block.getWorld().getPlayers()) {
+                                    Artid.protocolManager.sendServerPacket(p, packet1);
+                                }
+                            } catch (InvocationTargetException ex) {
+                                throw new RuntimeException(
+                                        "Cannot send packet " + packet1, ex);
+                            }
+                        }
+                    }.runTask(Artid.plug);
+                    break;
+                case AIR: case CAVE_AIR: case WATER: case GRASS: case TALL_GRASS: case SNOW: case FIRE: case WHEAT: case BARRIER: case SPRUCE_SIGN: case OAK_SIGN: case BIRCH_SIGN: case JUNGLE_SIGN: case DARK_OAK_SIGN:
 
 
 
             }
+            Location loc = new Location(world,pos.getX(),pos.getY(),pos.getZ());
+
+            new BukkitRunnable(){
+                @Override
+                public void run() {
+
+                    for(Entity e : world.getNearbyEntities(loc, 2,3,2)){
+                        if(e.getBoundingBox().contains(pos)){
+                            posit = pos;
+                        }
+                    }
+                }
+            }.runTask(Artid.plug);
+
+
             positions.add(getPosition(d));
         }
         return positions;
@@ -158,9 +204,13 @@ public class rayTracer {
     }
 
     //debug / effects
-    public void highlight(World world, double blocksAway, double accuracy){
+    public void highlight(World world, Player p, double blocksAway, double accuracy){
+        int i = 0;
         for(Vector position : traverse(blocksAway,accuracy, world)){
-            world.spawnParticle(Particle.FLAME, position.toLocation(world), 0);
+
+            if(i>1) p.spawnParticle(Particle.FLAME, position.toLocation(world), 0);
+            //world.spawnParticle(Particle.FLAME, position.toLocation(world), 0);
+            i++;
         }
     }
 
@@ -177,6 +227,12 @@ public class rayTracer {
         if(intersects(z2, e.getBoundingBox().getMin(), e.getBoundingBox().getMax())) return true;
         Bukkit.getConsoleSender().sendMessage("Missed");
         return false;
+    }
+    public Vector getPos(){
+        return posit;
+    }
+    public int getWalls(){
+        return walls;
     }
 
 }
