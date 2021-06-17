@@ -22,6 +22,5 @@ public class playerJoin implements Listener{
         if(e.getPlayer().getGameMode()!=GameMode.CREATIVE) e.getPlayer().setGameMode(GameMode.SURVIVAL);
         e.getPlayer().getInventory().clear();
 
-
     }
 }

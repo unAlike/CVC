@@ -21,8 +21,7 @@ public class InventoryClick implements Listener {
         }
         if(e.getView().getTitle().equals("Weapon Selector")) {
             e.setCancelled(true);
-
-            if(e.getCurrentItem().getType()!=null) {
+            if(!e.getCurrentItem().getType().equals(null)) {
                 switch (e.getCurrentItem().getType()) {
                     //////////////////////////////////////MAIN GUNS////////////////////////////
                     case NETHERITE_SWORD:

@@ -27,7 +27,7 @@ public class playerChangeItem implements Listener {
                 public void run() {
                     mplayer.getMain().setCooldown(false);
                 }
-            }.runTaskLater(Artid.plug, ((long) mplayer.getMain().getFireRate()));
+            }.runTaskLater(Artid.plug, ((long) mplayer.getMain().getFireRate()/2));
         }
         if(e.getNewSlot()==1 && mplayer.getOffhand()!=null){
             mplayer.getOffhand().setCooldown(true);
@@ -36,7 +36,7 @@ public class playerChangeItem implements Listener {
                 public void run() {
                     mplayer.getOffhand().setCooldown(false);
                 }
-            }.runTaskLater(Artid.plug, ((long) mplayer.getOffhand().getFireRate()));
+            }.runTaskLater(Artid.plug, ((long) mplayer.getOffhand().getFireRate()/2));
         }
         if(e.getPlayer().getInventory().getItem(e.getNewSlot()) != null) {
             switch (e.getPlayer().getInventory().getItem(e.getNewSlot()).getType()) {

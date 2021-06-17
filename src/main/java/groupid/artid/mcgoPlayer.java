@@ -17,12 +17,14 @@ public class mcgoPlayer {
 
     public gun main;
     public gun offhand;
+    public boolean onFire;
 
 
     public mcgoPlayer(Player p){
         this.name = p.getName();
         this.UUID = p.getUniqueId().toString();
         this.player = p;
+        onFire = false;
         main=null;
         offhand=null;
         new BukkitRunnable(){
@@ -34,6 +36,18 @@ public class mcgoPlayer {
                 }
             }
         }.runTaskTimer(Artid.plug,0,1);
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                if(player.getFireTicks()>0){
+                    player.damage((Double)1.0);
+                    player.setNoDamageTicks(0);
+                    player.setFireTicks(1);
+                    onFire = false;
+                }
+            }
+        }.runTaskTimer(Artid.plug, 0,5);
+
     }
     public void setMain(gun m){
         main = m;

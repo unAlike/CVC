@@ -22,6 +22,11 @@ public class commands implements CommandExecutor {
                         p.getInventory().clear();
                         p.teleport(new Location(Bukkit.getWorld("world"), 0.5, 63, 0.5));
                         break;
+                    case "fix":
+                        for(Player pla : p.getWorld().getPlayers()){
+                            pla.setInvulnerable(false);
+                        }
+                        break;
                     case "reset": case "r":
 
                 }

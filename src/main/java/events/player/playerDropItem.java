@@ -14,9 +14,6 @@ public class playerDropItem implements Listener {
             default:
                 e.setCancelled(true);
                 break;
-            case GHAST_TEAR:
-                e.setCancelled(true);
-                break;
             case WOODEN_PICKAXE: case GOLDEN_PICKAXE: case STONE_PICKAXE:
                 //e.setCancelled(true);
                 e.getItemDrop().getItemStack().setAmount(e.getPlayer().getInventory().getItem(1).getAmount()+1);

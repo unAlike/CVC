@@ -45,7 +45,6 @@ public final class Artid extends JavaPlugin implements Listener {
             }
         }.runTaskTimer(this,0,5);
         for(Player p : this.getServer().getOnlinePlayers()){
-
             mcPlayers.put(p.getUniqueId().toString(), new mcgoPlayer(p));
             if(p.getGameMode()!=GameMode.CREATIVE) {
                 p.setGameMode(GameMode.SURVIVAL);
@@ -93,7 +92,8 @@ public final class Artid extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new playerSleep(), this);
         getServer().getPluginManager().registerEvents(new playerPickupItem(), this);
         getServer().getPluginManager().registerEvents(new blockBreak(), this);
-        getServer().getPluginManager().registerEvents(new playerDeath(), this);
+        getServer().getPluginManager().registerEvents(new PlayerOpenInventory(), this);
+        //getServer().getPluginManager().registerEvents(new playerDeath(), this);
 
 
         //Register Commands
