@@ -153,32 +153,7 @@ public class PlayerInteract implements Listener {
         }
         else {e.setCancelled(false);}
     }
-    @EventHandler
-    public void animationEvent(PlayerAnimationEvent e){
-//
-//        Block focused = e.getPlayer().getTargetBlock((Set<Material>) null, 5);
-//        if(e.getAnimationType() == PlayerAnimationType.ARM_SWING && focused.getType() != Material.AIR) {
-//            e.setCancelled(true);
-//
-//            switch(e.getPlayer().getInventory().getItemInMainHand().getType()){
-//                    case WOODEN_AXE:
-//                        break;
-//                case IRON_AXE:
-//                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain().reload();
-//                    break;
-//                        /////////////////PISTOLS////////////////////////////
-//                case WOODEN_PICKAXE: case STONE_PICKAXE: case GOLDEN_PICKAXE:
-//                    if(Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getOffhand()!=null)Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getOffhand().reload();
-//                    break;
-//                    //////////////////////////NADES//////////////////////////////
-//                    case OAK_SAPLING: case BIRCH_SAPLING: case DARK_OAK_SAPLING: case ACACIA_SAPLING: case JUNGLE_SAPLING:
-//                        if(e.getPlayer().getExp()+.24999 >= 1){
-//                            e.getPlayer().setExp(0.00000000000000000001f);
-//                        }
-//                        else e.getPlayer().setExp(e.getPlayer().getExp()+.2499999999999f);
-//                }
-//        }
-    }
+
     public void throwNade(PlayerInteractEvent e, Player p, Material m){
         e.setCancelled(true);
 

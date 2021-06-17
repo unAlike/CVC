@@ -1,6 +1,8 @@
 package events.entity;
 
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.PacketContainer;
 import groupid.artid.Artid;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
@@ -8,11 +10,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftArmorStand;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -21,6 +22,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.InvocationTargetException;
 import java.security.SecureRandom;
 import java.util.Objects;
 
@@ -58,18 +60,22 @@ public class damageEvent implements Listener {
 
     }
     public static void damageMarker(Location loc, World w, Player p, float dmg){
-        WorldServer s = ((CraftWorld)w.getWorld()).getHandle();
-        EntityArmorStand arm = new EntityArmorStand(EntityTypes.ARMOR_STAND, s);
-        arm.setLocation(loc.getX(),loc.getY(),loc.getZ(),loc.getPitch(), loc.getYaw());
+
+
+
+
+        EntityArmorStand arm = new EntityArmorStand(w,loc.getX(),loc.getY()+2,loc.getZ());
         arm.setInvisible(true);
         arm.setInvulnerable(true);
         arm.setMarker(true);
-        arm.setCustomName(new ChatMessage(ChatColor.RED + "" + Math.ceil(dmg * 5)));
+        arm.setCustomName(new ChatMessage(ChatColor.RED + "" + ((int) Math.ceil(dmg))));
         arm.setCustomNameVisible(true);
         arm.setNoGravity(true);
-        s.addEntity(arm);
-        PacketPlayOutSpawnEntityLiving pack = new PacketPlayOutSpawnEntityLiving(arm);
-        ((CraftPlayer)p).getHandle().playerConnection.sendPacket(pack);
+
+        final PacketPlayOutEntityMetadata[] pack = {new PacketPlayOutEntityMetadata(arm.getId(), arm.getDataWatcher(), true)};
+        final PacketPlayOutSpawnEntityLiving[] pack2 = {new PacketPlayOutSpawnEntityLiving(arm)};
+        ((CraftPlayer)p).getHandle().playerConnection.sendPacket(pack2[0]);
+        ((CraftPlayer)p).getHandle().playerConnection.sendPacket(pack[0]);
 
 
         new BukkitRunnable() {
@@ -77,7 +83,11 @@ public class damageEvent implements Listener {
             public void run() {
                 arm.setCustomNameVisible(false);
                 arm.killEntity();
-                ((CraftPlayer)p).getHandle().playerConnection.sendPacket(pack);
+                pack[0] = new PacketPlayOutEntityMetadata(arm.getId(), arm.getDataWatcher(), true);
+                pack2[0] = new PacketPlayOutSpawnEntityLiving(arm);
+                ((CraftPlayer)p).getHandle().playerConnection.sendPacket(pack2[0]);
+                ((CraftPlayer)p).getHandle().playerConnection.sendPacket(pack[0]);
+
             }
         }.runTaskLater(Artid.plug, 20);
 

@@ -41,7 +41,7 @@ public class shop {
         inv.setItem(22, customItem(Material.BONE, "Knife"));
 
     }
-    public ItemStack customItem(Material m, String name, ArrayList<String> lore){
+    public static ItemStack customItem(Material m, String name, ArrayList<String> lore){
         ItemStack item = new ItemStack(m);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(ChatColor.GREEN + name);
@@ -49,7 +49,7 @@ public class shop {
         item.setItemMeta(meta);
         return item;
     }
-    public ItemStack customItem(Material m, String name){
+    public static ItemStack customItem(Material m, String name){
         ItemStack item = new ItemStack(m);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(ChatColor.GREEN + name);

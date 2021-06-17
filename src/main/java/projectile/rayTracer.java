@@ -60,9 +60,8 @@ public class rayTracer {
         outer: for (double d = 0; d <= blocksAway; d += accuracy) {
             Vector pos = getPosition(d);
             for(Player p : world.getPlayers()){
-                if(p.getBoundingBox().contains(pos) && player != p){
-                    if(count>0) return positions;
-                    count++;
+                if(p.getBoundingBox().contains(pos.clone().subtract(direction.clone().multiply(1.01))) && p!=player) {
+                    return positions;
                 }
             }
 
@@ -141,7 +140,10 @@ public class rayTracer {
                     }
 
                     break;
-                case AIR: case CAVE_AIR: case WATER: case GRASS: case TALL_GRASS: case SNOW: case FIRE: case WHEAT: case BARRIER: case SPRUCE_SIGN: case OAK_SIGN: case BIRCH_SIGN: case JUNGLE_SIGN: case DARK_OAK_SIGN:
+                case AIR: case CAVE_AIR: case WATER: case GRASS: case TALL_GRASS: case SNOW: case FIRE: case WHEAT: case BARRIER: case SPRUCE_SIGN: case OAK_SIGN: case BIRCH_SIGN:
+                case JUNGLE_SIGN: case DARK_OAK_SIGN: case BLACK_CARPET: case BLUE_CARPET: case BROWN_CARPET: case CYAN_CARPET: case GRAY_CARPET: case GREEN_CARPET: case LIGHT_BLUE_CARPET:
+                case LIGHT_GRAY_CARPET: case LIME_CARPET: case MAGENTA_CARPET: case ORANGE_CARPET: case PINK_CARPET: case PURPLE_CARPET: case RED_CARPET: case WHITE_CARPET:
+                case YELLOW_CARPET:
 
 
 
@@ -226,14 +228,15 @@ public class rayTracer {
     //debug / effects
     public void highlight(World world, Player p, double blocksAway, double accuracy){
         int i = 0;
-        for(Vector position : traverse(blocksAway,.05, world,p)){
-            if(i>20){
+        for(Vector position : traverse(blocksAway,.1, world,p)){
+            if(i>10){
                 p.spawnParticle(Particle.FLAME, position.toLocation(world), 0);
                 i=0;
             }
             i++;
         }
     }
+
 
     public boolean getEntityOnLine(Entity e, World world){
         Vector x1, x2, z1, z2;

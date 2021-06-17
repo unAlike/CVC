@@ -1,6 +1,7 @@
 package groupid.artid;
 
 import guns.gun;
+import guns.gunTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -63,8 +64,11 @@ public class mcgoPlayer {
     }
     public void giveMainGun(){
         player.getInventory().setItem(0, main.getItem());
+        main.updateItem();
     }
-    public void giveOffhandGun(){player.getInventory().setItem(1, offhand.getItem());}
+    public void giveOffhandGun(){player.getInventory().setItem(1, offhand.getItem());
+        offhand.updateItem();
+    }
     public BoundingBox getBox(int ticks){
         return boxs.get(ticks);
     }

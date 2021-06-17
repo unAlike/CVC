@@ -2,9 +2,11 @@ package guns;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
+import events.entity.damageEvent;
 import groupid.artid.Artid;
 import groupid.artid.mcgoPlayer;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
@@ -356,6 +358,9 @@ public class gun {
     public boolean getIsReloading(){
         return isReloading;
     }
+    public void setIsReloading(boolean s){
+        isReloading = s;
+    }
 
 
     public void shoot(int numShots){
@@ -515,31 +520,43 @@ public class gun {
 
                                 @Override
                                 public void run() {
+                                    double fallOff;
                                     for (Map.Entry<String, mcgoPlayer> entry : Artid.mcPlayers.entrySet()) {
                                         mcgoPlayer mc = entry.getValue();
                                         Player ent = mc.player;
+                                        fallOff=Math.ceil(ent.getLocation().distance(p.getLocation()) * fallOffAmount);
                                         if (!ent.isDead()) {
                                             int ping = (((CraftPlayer) Bukkit.getPlayer(playerUUID)).getHandle().ping);
                                             BoundingBox box;
                                             if (mc.getBox((ping / 50) + 3) != null) {
-                                                box = mc.getBox((ping / 50) + 3);
+                                                box = mc.getBox((ping / 50) + 4);
                                             } else return;
                                             if (ray.intersects(box, 200, .05, w, p)) {
                                                 if (ent.getName() != p.getName() && ent instanceof Player) {
                                                     BoundingBox head = box.clone();
                                                     head.shift(0, ((LivingEntity) ent).getEyeHeight() - .2, 0);
                                                     if (head.contains(ray.getPos()) || ray.intersects(head, 100, .05, w, p)) {
-                                                            if(ray.getWalls()>0)((LivingEntity) ent).damage((damage * 2 *(.5*ray.getWalls()))/ 5);
-                                                            else ((LivingEntity) ent).damage((damage * 2)/ 5);
-                                                            //damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,damage*2/20);
+                                                            if(ray.getWalls()>0){
+                                                                ((LivingEntity) ent).damage((((damage-fallOff) * 2 *(Math.pow(.5,ray.getWalls())))/ 5));
+                                                                damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,(float)((damage-fallOff) * 2 *(Math.pow(.5,ray.getWalls()))));
+                                                            }
+                                                            else {
+                                                                ((LivingEntity) ent).damage(((damage-fallOff) * 2)/ 5);
+                                                                damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,((float) (damage-fallOff) * 2));
+                                                            };
                                                             ent.setNoDamageTicks(0);
                                                             headShot = true;
                                                             p.playSound(p.getLocation(), "mcgo.random.headshot_shooter", 1, 1);
                                                             ent.playSound(ent.getLocation(), "mcgo.random.headshot_victim", 1, 1);
                                                     } else {
-                                                        if(ray.getWalls()>0)((LivingEntity) ent).damage((damage *(.5*ray.getWalls()))/ 5);
-                                                        else ((LivingEntity) ent).damage((damage * 2)/ 5);
-                                                            //damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,damage/20);
+                                                        if(ray.getWalls()>0){
+                                                            ((LivingEntity) ent).damage(((damage-fallOff) *(Math.pow(.5,ray.getWalls())))/ 5);
+                                                            damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,(float) ((damage-fallOff) *(Math.pow(.5,ray.getWalls()))));
+                                                        }
+                                                        else {
+                                                            ((LivingEntity) ent).damage(((damage-fallOff))/ 5);
+                                                            damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,((float) (damage-fallOff)));
+                                                        }
                                                             ent.setNoDamageTicks(0);
                                                     }
                                                     if (((LivingEntity) ent).getHealth() <= 0) {

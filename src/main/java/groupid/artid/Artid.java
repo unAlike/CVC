@@ -8,6 +8,8 @@ import events.entity.entityHit;
 import events.entity.damageEvent;
 import events.player.*;
 import events.inventory.InventoryClick;
+import guns.gunTypes;
+import inventories.shop;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -51,9 +53,9 @@ public final class Artid extends JavaPlugin implements Listener {
             }
             if(!p.getWorld().equals("world")){
                 p.getInventory().clear();
-                p.getInventory().setItem(8,new ItemStack(Material.GHAST_TEAR));
-                p.getInventory().setItem(2, new ItemStack(Material.BONE));
-                p.getInventory().setItem(7, new ItemStack(Material.COMPASS));
+                p.getInventory().setItem(8, shop.customItem(Material.GHAST_TEAR,ChatColor.WHITE + "Shop"));
+                p.getInventory().setItem(2, shop.customItem(Material.BONE,ChatColor.WHITE + "Knife"));
+                p.getInventory().setItem(7, shop.customItem(Material.COMPASS,ChatColor.WHITE + "Set Spawn"));
             }
         }
         for(World w : Bukkit.getWorlds()){
@@ -106,5 +108,9 @@ public final class Artid extends JavaPlugin implements Listener {
     public void onDisable() {
 
     }
+
+
+
+
 
 }
