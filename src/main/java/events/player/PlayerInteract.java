@@ -1,14 +1,20 @@
 package events.player;
 
+import com.mojang.datafixers.util.Pair;
 import groupid.artid.Artid;
 import groupid.artid.mcgoPlayer;
 import inventories.shop;
+import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.EntitySnowball;
+import net.minecraft.server.v1_16_R3.EnumItemSlot;
+import net.minecraft.server.v1_16_R3.PacketPlayOutEntityEquipment;
 import org.bukkit.Art;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftSnowball;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Item;
@@ -26,6 +32,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class PlayerInteract implements Listener {
@@ -38,7 +46,6 @@ public class PlayerInteract implements Listener {
                 //Starts runnables & canncels events
                 switch (e.getItem().getType()) {
                     case GHAST_TEAR:
-
                         e.getPlayer().openInventory(shop.getInv());
                         break;
                     case COMPASS:
@@ -48,15 +55,18 @@ public class PlayerInteract implements Listener {
                         //########################## HEAVY GUNS #######################################################
                     case NETHERITE_SWORD:
                         if(Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain()!=null) {
-                            p.getMain().shootPing();
-                            e.setCancelled(true);
+                            if(!Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain().getCooldown() && !Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain().getIsReloading()) {
+                                p.getMain().shootPing();
+                                e.setCancelled(true);
+                            }
                         }
+
 
                         break;
                     case IRON_AXE: case STONE_SHOVEL: case GOLDEN_SHOVEL: case STONE_HOE: case GOLDEN_AXE:
                         if(Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain()!=null) {
-                            e.setCancelled(true);
                             p.getMain().setTimeSinceClick(0);
+                            e.setCancelled(true);
                         }
 
 

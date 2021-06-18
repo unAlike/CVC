@@ -31,6 +31,8 @@ public class damageEvent implements Listener {
     @EventHandler
     public void explosion(EntityDamageEvent e){
         switch(e.getCause()){
+            default:
+                break;
             case ENTITY_EXPLOSION:
                 e.setCancelled(true);
                 e.getEntity().getVelocity().setY(0);
@@ -45,6 +47,7 @@ public class damageEvent implements Listener {
             case FIRE:
                 e.setCancelled(true);
                 Artid.mcPlayers.get(e.getEntity().getUniqueId().toString()).onFire = true;
+                e.getEntity().setFireTicks(5);
                 break;
             case FIRE_TICK:
                 e.setCancelled(true);
@@ -53,8 +56,8 @@ public class damageEvent implements Listener {
                 if(e instanceof EntityDamageByEntityEvent) {
                     if (e.getEntity() instanceof Player && ((EntityDamageByEntityEvent) e).getDamager() instanceof Player && ((Player) ((EntityDamageByEntityEvent) e).getDamager()).getInventory().getItemInMainHand().getType().equals(Material.BONE)){
                         e.setDamage(4);
-                        ((Player) e.getEntity()).getPlayer().sendMessage("set the dmg");
                     }
+                    else e.setCancelled(true);
                 }
         }
 

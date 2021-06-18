@@ -1,14 +1,22 @@
 package groupid.artid;
 
+import com.mojang.datafixers.util.Pair;
 import guns.gun;
 import guns.gunTypes;
+import net.minecraft.server.v1_16_R3.Blocks;
+import net.minecraft.server.v1_16_R3.EnumItemSlot;
+import net.minecraft.server.v1_16_R3.ItemStack;
+import net.minecraft.server.v1_16_R3.PacketPlayOutEntityEquipment;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class mcgoPlayer {
     public String name;
@@ -18,6 +26,7 @@ public class mcgoPlayer {
 
     public gun main;
     public gun offhand;
+    public boolean blind = false;
     public boolean onFire;
 
 
@@ -28,6 +37,7 @@ public class mcgoPlayer {
         onFire = false;
         main=null;
         offhand=null;
+
         new BukkitRunnable(){
             @Override
             public void run() {
@@ -43,7 +53,6 @@ public class mcgoPlayer {
                 if(player.getFireTicks()>0){
                     player.damage((Double)1.0);
                     player.setNoDamageTicks(0);
-                    player.setFireTicks(1);
                     onFire = false;
                 }
             }

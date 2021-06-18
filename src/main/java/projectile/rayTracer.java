@@ -33,6 +33,7 @@ public class rayTracer {
     Vector posit;
     Player hitPlayer;
     int walls = 0;
+    boolean throughSmoke = false;
     ArrayList<Block> hitBlocks = new ArrayList<Block>();
 
     public rayTracer(Vector origin, Vector direction) {
@@ -60,7 +61,9 @@ public class rayTracer {
         outer: for (double d = 0; d <= blocksAway; d += accuracy) {
             Vector pos = getPosition(d);
             for(Player p : world.getPlayers()){
-                if(p.getBoundingBox().contains(pos.clone().subtract(direction.clone().multiply(1.01))) && p!=player) {
+                if(p.getBoundingBox().contains(pos) && p!=player) {
+                    positions.add(getPosition(d+accuracy));
+                    positions.add(getPosition(d+(accuracy*2)));
                     return positions;
                 }
             }
@@ -69,6 +72,8 @@ public class rayTracer {
 
 
             switch (block.getType()){
+
+
                 case COAL_ORE: case OAK_LEAVES: case IRON_ORE: case DIAMOND_ORE: case ACACIA_LEAVES: case BIRCH_LEAVES: case DARK_OAK_LEAVES: case SPRUCE_LEAVES:
                 case WHITE_STAINED_GLASS_PANE: case GLASS_PANE: case HAY_BLOCK: case GLASS: case EMERALD_ORE: case JUNGLE_LEAVES: case WHITE_STAINED_GLASS: case LIGHT_GRAY_STAINED_GLASS_PANE:
                     Material type;
@@ -140,7 +145,11 @@ public class rayTracer {
                     }
 
                     break;
-                case AIR: case CAVE_AIR: case WATER: case GRASS: case TALL_GRASS: case SNOW: case FIRE: case WHEAT: case BARRIER: case SPRUCE_SIGN: case OAK_SIGN: case BIRCH_SIGN:
+
+                case WHEAT:
+                    throughSmoke = true;
+                    break;
+                case AIR: case CAVE_AIR: case WATER: case GRASS: case TALL_GRASS: case SNOW: case FIRE: case BARRIER: case SPRUCE_SIGN: case OAK_SIGN: case BIRCH_SIGN:
                 case JUNGLE_SIGN: case DARK_OAK_SIGN: case BLACK_CARPET: case BLUE_CARPET: case BROWN_CARPET: case CYAN_CARPET: case GRAY_CARPET: case GREEN_CARPET: case LIGHT_BLUE_CARPET:
                 case LIGHT_GRAY_CARPET: case LIME_CARPET: case MAGENTA_CARPET: case ORANGE_CARPET: case PINK_CARPET: case PURPLE_CARPET: case RED_CARPET: case WHITE_CARPET:
                 case YELLOW_CARPET:
@@ -260,6 +269,9 @@ public class rayTracer {
     }
     public Player getHitEnt(){
         return hitPlayer;
+    }
+    public boolean isThroughSmoke(){
+        return throughSmoke;
     }
 
 }
