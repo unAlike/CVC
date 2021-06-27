@@ -46,7 +46,7 @@ public class molly extends BukkitRunnable {
                 }
                 break;
             case 3:
-                radius = 5;
+                radius = 4;
                 for (int Y = -radius; Y < radius; Y++)
                     for (int X = -radius; X < radius; X++)
                         for (int Z = -radius; Z < radius; Z++)

@@ -55,7 +55,11 @@ public class damageEvent implements Listener {
             case ENTITY_ATTACK:
                 if(e instanceof EntityDamageByEntityEvent) {
                     if (e.getEntity() instanceof Player && ((EntityDamageByEntityEvent) e).getDamager() instanceof Player && ((Player) ((EntityDamageByEntityEvent) e).getDamager()).getInventory().getItemInMainHand().getType().equals(Material.BONE)){
-                        e.setDamage(4);
+                        if(((Player) e.getEntity()).getHealth()-4 >= 0) {
+                            ((Player) e.getEntity()).setHealth(((Player) e.getEntity()).getHealth() - 4);
+                        }
+                        else ((Player) e.getEntity()).damage((double)20);
+                        damageMarker(e.getEntity().getLocation(), ((CraftWorld)(e.getEntity().getWorld())).getHandle(), ((Player) ((EntityDamageByEntityEvent) e).getDamager()).getPlayer(), 4*5);
                     }
                     else e.setCancelled(true);
                 }

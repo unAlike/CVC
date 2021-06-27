@@ -50,7 +50,7 @@ public class playerInteractEntity implements Listener {
                         break;
                     case "Reserve":
                         e.setCancelled(true);
-                        e.getPlayer().teleport(new Location(Bukkit.getWorld("Reserve"), 83,44,-247));
+                        e.getPlayer().teleport(new Location(Bukkit.getWorld("Reserve"), 85,44,-276));
                         e.getPlayer().setGameMode(GameMode.SURVIVAL);
                         giveItems(e.getPlayer());
                         break;

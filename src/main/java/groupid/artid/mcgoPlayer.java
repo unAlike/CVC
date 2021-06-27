@@ -15,6 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class mcgoPlayer {
     public gun offhand;
     public boolean blind = false;
     public boolean onFire;
+    public boolean hypixelNades = false;
 
 
     public mcgoPlayer(Player p){
@@ -38,6 +40,19 @@ public class mcgoPlayer {
         main=null;
         offhand=null;
 
+
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                final Pair<net.minecraft.server.v1_16_R3.EnumItemSlot,net.minecraft.server.v1_16_R3.ItemStack> pr = new Pair<net.minecraft.server.v1_16_R3.EnumItemSlot,net.minecraft.server.v1_16_R3.ItemStack>(EnumItemSlot.HEAD, new net.minecraft.server.v1_16_R3.ItemStack(Blocks.AIR));
+                for (final Player d : player.getWorld().getPlayers()) {
+                    if(p!=d) {
+                        final PacketPlayOutEntityEquipment pt = new PacketPlayOutEntityEquipment(((CraftPlayer) d).getHandle().getId(), Arrays.asList(pr));
+                        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(pt);
+                    }
+                }
+            }
+        }.runTaskTimer(Artid.plug,0,1);
         new BukkitRunnable(){
             @Override
             public void run() {

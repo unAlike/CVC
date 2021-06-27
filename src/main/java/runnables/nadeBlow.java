@@ -7,6 +7,8 @@ import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.BoundingBox;
@@ -83,6 +85,16 @@ public class nadeBlow extends BukkitRunnable {
         f.detonate();
         ar.getWorld().playSound(ar.getLocation(), "mcgo.throwables.explodeflashbang", 5, 1);
         for(Player player : ar.getWorld().getPlayers()){
+            if(player.getLocation().distance(ar.getLocation())<10){
+                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60,1000));
+                Artid.mcPlayers.get(player.getUniqueId().toString()).blind = true;
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        Artid.mcPlayers.get(player.getUniqueId().toString()).blind = false;
+                    }
+                }.runTaskLater(Artid.plug, 20);
+            }
 
         }
         if(ar.getVehicle()!=null) ar.getVehicle().remove();

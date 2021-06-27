@@ -38,7 +38,7 @@ import java.util.Set;
 
 public class PlayerInteract implements Listener {
     @EventHandler
-    public void rightClick(PlayerInteractEvent e) {
+    public void rightClick(PlayerInteractEvent e){
         shop shop = new shop();
         mcgoPlayer p = Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString());
         if (e.getItem() != null) {
@@ -72,15 +72,15 @@ public class PlayerInteract implements Listener {
 
                         break;
                     case DIAMOND_SHOVEL:
-                        if(Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain()!=null) {
-                            e.setCancelled(true);
-                            p.getMain().shoot(9);
+                        e.setCancelled(true);
+                        if(Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain()!=null && !Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain().getCooldown()) {
+                            p.getMain().shootPing(9);
                         }
                         break;
                     case WOODEN_AXE:
-                        if(Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain()!=null) {
-                            e.setCancelled(true);
-                            p.getMain().shoot(6);
+                        e.setCancelled(true);
+                        if(Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain()!=null && !Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain().getCooldown()) {
+                            p.getMain().shootPing(6);
                         };
                         break;
                         //############################ PISTOLS #########################################################
@@ -153,10 +153,12 @@ public class PlayerInteract implements Listener {
                     break;
                     //////////////////////////NADES//////////////////////////////
                     case OAK_SAPLING: case BIRCH_SAPLING: case DARK_OAK_SAPLING: case ACACIA_SAPLING: case JUNGLE_SAPLING:
-                        if(e.getPlayer().getExp()+.24999 >= 1){
-                            e.getPlayer().setExp(0.00000000000000000001f);
+                        if(!Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).hypixelNades) {
+                            if (e.getPlayer().getExp() + .24999 >= 1) {
+                                e.getPlayer().setExp(0.00000000000000000001f);
+                            } else e.getPlayer().setExp(e.getPlayer().getExp() + .2499999999999f);
                         }
-                        else e.getPlayer().setExp(e.getPlayer().getExp()+.2499999999999f);
+                        break;
                 }
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -190,9 +192,11 @@ public class PlayerInteract implements Listener {
         as.setCollidable(false);
         as.getEquipment().setItemInMainHand(item);
         ball.addPassenger(as);
-        ball.setVelocity(e.getPlayer().getLocation().getDirection().multiply(e.getPlayer().getExp()*1.25).add(e.getPlayer().getVelocity()));
+        if(!Artid.mcPlayers.get(p.getUniqueId().toString()).hypixelNades) {
+            ball.setVelocity(e.getPlayer().getLocation().getDirection().multiply(e.getPlayer().getExp() * 1.25).add(e.getPlayer().getVelocity()));
+        }
+        else{
+            ball.setVelocity(e.getPlayer().getLocation().getDirection().multiply(1).add(e.getPlayer().getVelocity()));
+        }
     }
-//    @EventHandler
-//    public void idk(Player)
-
 }

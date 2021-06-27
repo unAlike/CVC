@@ -44,7 +44,9 @@ public class playerChangeItem implements Listener {
                     e.getPlayer().setExp(0.0001f);
                     break;
                 case OAK_SAPLING: case DARK_OAK_SAPLING: case BIRCH_SAPLING: case ACACIA_SAPLING: case JUNGLE_SAPLING:
-                    e.getPlayer().setExp(.5f);
+                    if(!Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).hypixelNades) {
+                        e.getPlayer().setExp(.5f);
+                    }
                     break;
             }
         }else e.getPlayer().setExp(0.0001f);

@@ -63,7 +63,7 @@ public class InventoryClick implements Listener {
                         p.setMain(new gun(10, 40, 30, 10, 10, new ItemStack(Material.WOODEN_AXE, 10), 0, 15, "mcgo.weapons.shotgunshot", "Spas", "銜銝",p.player,0,.1f));
                         p.giveMainGun();
                         e.setCancelled(true);
-                    /////////////////////////////////PISTOLS/////////////////////////////
+                        /////////////////////////////////PISTOLS/////////////////////////////
                     case WOODEN_PICKAXE:
                         p.setOffhand(new gun(6, 30, 20, 13, 13, new ItemStack(Material.WOODEN_PICKAXE, 13), 2f, 1, "mcgo.weapons.pistolshot", "USP", "銏", p.player,1,0.05f));
                         p.giveOffhandGun();

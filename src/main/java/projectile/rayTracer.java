@@ -1,13 +1,14 @@
 package projectile;
 
+import bot.CVCBot;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import groupid.artid.Artid;
-import net.minecraft.server.v1_16_R3.BlockPosition;
-import net.minecraft.server.v1_16_R3.PacketPlayOutBlockBreakAnimation;
-import net.minecraft.server.v1_16_R3.Position;
-import net.minecraft.server.v1_16_R3.WorldServer;
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.*;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
@@ -67,7 +68,13 @@ public class rayTracer {
                     return positions;
                 }
             }
-
+            for(CVCBot bot : Artid.bots){
+                if(bot.getBoundingBox().d(new Vec3D(pos.getX(),pos.getY(),pos.getZ())) && bot!=player) {
+                    positions.add(getPosition(d+accuracy));
+                    positions.add(getPosition(d+(accuracy*2)));
+                    return positions;
+                }
+            }
             Block block = world.getBlockAt((int)Math.floor(pos.getX()),(int)Math.floor(pos.getY()),(int)Math.floor(pos.getZ()));
 
 
@@ -75,19 +82,24 @@ public class rayTracer {
 
 
                 case COAL_ORE: case OAK_LEAVES: case IRON_ORE: case DIAMOND_ORE: case ACACIA_LEAVES: case BIRCH_LEAVES: case DARK_OAK_LEAVES: case SPRUCE_LEAVES:
-                case WHITE_STAINED_GLASS_PANE: case GLASS_PANE: case HAY_BLOCK: case GLASS: case EMERALD_ORE: case JUNGLE_LEAVES: case WHITE_STAINED_GLASS: case LIGHT_GRAY_STAINED_GLASS_PANE:
+                case WHITE_STAINED_GLASS_PANE: case GLASS_PANE: case HAY_BLOCK: case GLASS: case EMERALD_ORE: case JUNGLE_LEAVES: case LIGHT_GRAY_STAINED_GLASS_PANE:
+                case BLACK_STAINED_GLASS_PANE: case BLUE_STAINED_GLASS_PANE: case BROWN_STAINED_GLASS_PANE: case PINK_STAINED_GLASS_PANE: case CYAN_STAINED_GLASS_PANE: case PURPLE_STAINED_GLASS_PANE:
+                case GRAY_STAINED_GLASS_PANE: case LIGHT_BLUE_STAINED_GLASS_PANE: case MAGENTA_STAINED_GLASS_PANE: case GREEN_STAINED_GLASS_PANE: case LIME_STAINED_GLASS_PANE:
+                case ORANGE_STAINED_GLASS_PANE: case RED_STAINED_GLASS_PANE: case YELLOW_STAINED_GLASS_PANE:
                     Material type;
+                    BlockData data = block.getBlockData();
                     type = block.getType();
                     new BukkitRunnable(){
                         @Override
                         public void run() {
                             block.setType(type);
+                            block.setBlockData(data);
                         }
                     }.runTaskLater(Artid.plug, 200);
                     new BukkitRunnable(){
                         @Override
                         public void run() {
-                            block.setType(Material.AIR);
+                            block.setType(Material.AIR, false);
                         }
                     }.runTaskLater(Artid.plug,1);
 
@@ -152,7 +164,7 @@ public class rayTracer {
                 case AIR: case CAVE_AIR: case WATER: case GRASS: case TALL_GRASS: case SNOW: case FIRE: case BARRIER: case SPRUCE_SIGN: case OAK_SIGN: case BIRCH_SIGN:
                 case JUNGLE_SIGN: case DARK_OAK_SIGN: case BLACK_CARPET: case BLUE_CARPET: case BROWN_CARPET: case CYAN_CARPET: case GRAY_CARPET: case GREEN_CARPET: case LIGHT_BLUE_CARPET:
                 case LIGHT_GRAY_CARPET: case LIME_CARPET: case MAGENTA_CARPET: case ORANGE_CARPET: case PINK_CARPET: case PURPLE_CARPET: case RED_CARPET: case WHITE_CARPET:
-                case YELLOW_CARPET:
+                case YELLOW_CARPET: case TRIPWIRE: case TRIPWIRE_HOOK:
 
 
 
@@ -173,6 +185,7 @@ public class rayTracer {
             }.runTask(Artid.plug);
 
             positions.add(getPosition(d));
+
 
         }
         return positions;

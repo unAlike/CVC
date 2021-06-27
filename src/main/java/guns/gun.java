@@ -2,13 +2,9 @@ package guns;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
-import com.mojang.datafixers.util.Pair;
 import events.entity.damageEvent;
 import groupid.artid.Artid;
 import groupid.artid.mcgoPlayer;
-import net.minecraft.server.v1_16_R3.Blocks;
-import net.minecraft.server.v1_16_R3.EnumItemSlot;
-import net.minecraft.server.v1_16_R3.PacketPlayOutEntityEquipment;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
@@ -21,22 +17,20 @@ import projectile.rayTracer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class gun {
     int fireRate;
     float reloadTime;
     float damage;
+    float maxRecoil;
+    float spread;
     int maxAmmo;
     int ammo;
     ItemStack item;
 
-    float maxRecoil;
-    float spread;
+
     String soundEffect;
     String name;
     UUID playerUUID;
@@ -66,8 +60,8 @@ public class gun {
         this.spread = spread;
         this.soundEffect = soundEffect;
         this.name = name;
-        this.playerUUID = p.getUniqueId();
         this.gunImg = gunImg;
+        this.playerUUID=p.getUniqueId();
         this.slot=slot;
         this.fallOffAmount = fallOffAmount;
         ItemMeta meta = item.getItemMeta();
@@ -85,13 +79,15 @@ public class gun {
         new BukkitRunnable(){
             @Override
             public void run() {
-                if(p.getPlayer().getInventory().getItemInMainHand().equals(item) && timeSinceClick<5) {
+                if(Bukkit.getPlayer(playerUUID).getInventory().getItemInMainHand().equals(item) && timeSinceClick<5) {
                     shootPing();
                 }
             }
         }.runTaskTimer(Artid.plug, 0, fireRate);
     }
-
+    public void setPlayerUUID(UUID uid){
+        this.playerUUID = uid;
+    }
     public void reload(){
         if(!isReloading && ammo!=maxAmmo) {
             World w = Bukkit.getPlayer(playerUUID).getWorld();
@@ -109,7 +105,7 @@ public class gun {
                             if (Bukkit.getPlayer(playerUUID).getInventory().getItemInMainHand().getType().equals(item.getType())) {
                                 item.setDurability((short) (item.getType().getMaxDurability() - (inc * counter)));
                                 updateItem();
-                                if (counter >= 12) {
+                                if (counter >= 11) {
                                     isReloading = false;
                                     item.setDurability((short) (0));
                                     item.setAmount(maxAmmo);
@@ -160,80 +156,86 @@ public class gun {
         Bukkit.getPlayer(playerUUID).sendMessage("Ammo: "+ammo +"\nMax Ammo: "+maxAmmo+"\nDamage: "+damage);
     }
 
+    public void setSpread(float s){
+        spread = s;
+    }
+    public void setMaxRecoil(float r){
+        maxRecoil = r;
+    }
+    public int getSnipeState(){
+        return snipeState;
+    }
+    public void setSnipeState(int i){
+        snipeState = i;
+    }
+    public void setTimeSinceClick(float time){
+        timeSinceClick = time;
+    }
 
-    public void shoot(int numShots){
-        if(isReloading && ammo>0){
-            isReloading=false;
-        }
-        if (!cooldown && !isReloading) {
-            cooldown=true;
-            if (ammo >= 1) {
-                for (int i = 0; i < numShots; i++) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
+    public void updateItem(){
+        Bukkit.getPlayer(playerUUID).getInventory().setItem(slot,item);
+    }
 
+    public int getAmmo() {
+        return ammo;
+    }
 
-                            if (ammo != 0) item.setAmount(ammo);
-                            else reload();
-                            World w = Bukkit.getPlayer(playerUUID).getWorld();
-                            Player p = Bukkit.getPlayer(playerUUID);
-                            p.getInventory().setItemInMainHand(item);
-                            if(item.getType().equals(Material.GOLDEN_AXE) && snipeState > 0){
-                                final List<Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack>> equipmentList = new ArrayList<>();
-                                equipmentList.add(new Pair<>(EnumItemSlot.HEAD, new net.minecraft.server.v1_16_R3.ItemStack(Blocks.CARVED_PUMPKIN)));
-                                PacketPlayOutEntityEquipment pack = new PacketPlayOutEntityEquipment(p.getEntityId(), equipmentList);
-                                ((CraftPlayer)p).getHandle().playerConnection.sendPacket(pack);
-                            }
-                            Location loc = p.getPlayer().getLocation();
-                            double rand;
-
-                            if (p.getPlayer().isSneaking()) loc.add(0, 1.35, 0);
-                            if (!p.getPlayer().isSneaking()) loc.add(0, 1.75, 0);
-
-                            rand = (ThreadLocalRandom.current().nextFloat() - .5) * spread;
-                            loc.setYaw(loc.getYaw() + (float) rand);
-                            rand = (ThreadLocalRandom.current().nextFloat() - .5) * spread;
-                            loc.setPitch(loc.getPitch() + (float) rand);
-
-                            rayTracer ray = new rayTracer(loc.toVector(), loc.getDirection());
-                            ray.highlight(w, p, 100, 1);
-
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    for (Entity ent : w.getNearbyEntities(loc, 100, 100, 100)) {
-                                        if (ray.intersects(ent.getBoundingBox(), 200, .05, w,p)) {
-                                            if (ent.getName() != p.getName() && ent instanceof LivingEntity) {
-
-                                                ((LivingEntity) ent).damage(damage / 5);
-                                                ((LivingEntity) ent).setNoDamageTicks(0);
-                                                p.playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
-                                                if (ent.isDead()) {
-                                                    p.getPlayer().sendMessage(ChatColor.BOLD + (ChatColor.AQUA + p.getPlayer().getName() + ChatColor.WHITE + " 銈銉 " + ChatColor.GREEN + ent.getName()));
-                                                    p.playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }.runTask(Artid.plug);
-                        }
-                    }.runTaskAsynchronously(Artid.plug);
-                }
-                Bukkit.getPlayer(playerUUID).getWorld().playSound(Bukkit.getPlayer(playerUUID).getLocation(), soundEffect, 5f, 1f);
-                ammo--;
-                if (ammo < 1) {
-                    reload();
-                }
-            }
-            new BukkitRunnable(){
-                @Override
-                public void run() {
-                    cooldown=false;
-                }
-            }.runTaskLater(Artid.plug, fireRate);
-        }
+    public float getFireRate() {
+        return fireRate;
+    }
+    public void setFireRate(int fireRate) {
+        this.fireRate = fireRate;
+    }
+    public float getDamage() {
+        return damage;
+    }
+    public void setDamage(float damage) {
+        this.damage = damage;
+    }
+    public int getMaxAmmo() {
+        return maxAmmo;
+    }
+    public void setAmmo(int ammo){
+        this.ammo=ammo;
+    }
+    public void setMaxAmmo(int maxAmmo) {
+        this.maxAmmo = maxAmmo;
+    }
+    public ItemStack getItem() {
+        return item;
+    }
+    public void setItem(ItemStack item) {
+        this.item = item;
+    }
+    public float getRecoil() {
+        return recoil;
+    }
+    public void setRecoil(float recoil) {
+        this.recoil = recoil;
+    }
+    public String getSoundEffect() {
+        return soundEffect;
+    }
+    public void setSoundEffect(String soundEffect) {
+        this.soundEffect = soundEffect;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public boolean getCooldown(){
+        return cooldown;
+    }
+    public void setCooldown(boolean c){
+        cooldown = c;
+    }
+    public boolean getIsReloading(){
+        return isReloading;
+    }
+    public void setIsReloading(boolean s){
+        isReloading = s;
     }
 
     public void shootPing(){
@@ -252,7 +254,7 @@ public class gun {
                                 public void run() {
                                     cooldown = false;
                                 }
-                            }.runTaskLater(Artid.plug, fireRate+1);
+                            }.runTaskLater(Artid.plug, fireRate);
                         }
                         if (ammo >= 1) {
                             ammo--;
@@ -315,7 +317,7 @@ public class gun {
                                 @Override
                                 public void run() {
                                     double fallOff;
-                                    for (Map.Entry<String, mcgoPlayer> entry : Artid.mcPlayers.entrySet()) {
+                                    for (Map.Entry<String, mcgoPlayer> entry : Artid.mcPlayers.entrySet() ) {
                                         mcgoPlayer mc = entry.getValue();
                                         Player ent = mc.player;
 
@@ -333,12 +335,26 @@ public class gun {
                                                     head.shift(0, ((LivingEntity) ent).getEyeHeight() - .2, 0);
                                                     if (head.contains(ray.getPos()) || ray.intersects(head, 100, .05, w, p)) {
                                                             if(ray.getWalls()>0){
-                                                                ((LivingEntity) ent).damage(((((damage) * 2 *(Math.pow(.5,ray.getWalls())))-fallOff)/ 5));
-                                                                damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,(float)(((damage) * 2 *(Math.pow(.5,ray.getWalls())))-fallOff));
+                                                                if(ent.getDisplayName().equals("Bot")){
+                                                                    p.sendMessage(ChatColor.RED + "" + ((((damage) * 2 * (Math.pow(.5, ray.getWalls()))) - fallOff))+ " Damage"+ ". Walls: "+ ray.getWalls() + ChatColor.GOLD);
+                                                                    damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,(float)(((damage) * 2 *(Math.pow(.5,ray.getWalls())))-fallOff));
+                                                                    ((LivingEntity) ent).damage(0.00001);
+                                                                }
+                                                                else {
+                                                                    ((LivingEntity) ent).damage(((((damage) * 2 * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5));
+                                                                    damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damage) * 2 * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                }
                                                             }
                                                             else {
-                                                                ((LivingEntity) ent).damage((((damage) * 2)-fallOff)/ 5);
-                                                                damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,((float) (((damage) * 2)-fallOff)));
+                                                                if(ent.getDisplayName().equals("Bot")) {
+                                                                    p.sendMessage(ChatColor.RED + "" + (((damage) * 2) - fallOff) + " Damage");
+                                                                    damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,((float) (((damage) * 2)-fallOff)));
+                                                                    ((LivingEntity) ent).damage(0.00001);
+                                                                }
+                                                                else {
+                                                                    ((LivingEntity) ent).damage((((damage) * 2) - fallOff) / 5);
+                                                                    damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (((damage) * 2) - fallOff)));
+                                                                }
                                                             };
                                                             ent.setNoDamageTicks(0);
                                                             headShot = true;
@@ -346,23 +362,40 @@ public class gun {
                                                             ent.playSound(ent.getLocation(), "mcgo.random.headshot_victim", 1, 1);
                                                     } else {
                                                         if(ray.getWalls()>0){
-                                                            ((LivingEntity) ent).damage((((damage) *(Math.pow(.5,ray.getWalls())))-fallOff)/ 5);
-                                                            damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,(float) (((damage) *(Math.pow(.5,ray.getWalls())))-fallOff));
+                                                            if(ent.getDisplayName().equals("Bot")) {
+                                                                p.sendMessage(ChatColor.RED + "" + (((damage) * (Math.pow(.5, ray.getWalls()))) - fallOff)+ " Damage. Walls: "+ ray.getWalls() + ChatColor.GOLD);
+                                                                damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,(float) (((damage) *(Math.pow(.5,ray.getWalls())))-fallOff));
+                                                                ((LivingEntity) ent).damage(0.00001);
+                                                            }
+                                                            else {
+                                                                ((LivingEntity) ent).damage((((damage) * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5);
+                                                                damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damage) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                            }
                                                         }
                                                         else {
-                                                            ((LivingEntity) ent).damage((((damage))-fallOff)/ 5);
-                                                            damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,((float) (damage-fallOff)));
+                                                            if(ent.getDisplayName().equals("Bot")) {
+                                                                p.sendMessage(ChatColor.RED + "" + (((damage)) - fallOff)+ " Damage");
+                                                                damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,((float) (damage-fallOff)));
+                                                                ((LivingEntity) ent).damage(0.00001);
+                                                            }
+                                                            else {
+                                                                ((LivingEntity) ent).damage((((damage)) - fallOff) / 5);
+                                                                damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damage - fallOff)));
+                                                            }
                                                         }
                                                             ent.setNoDamageTicks(0);
                                                     }
                                                     if (((LivingEntity) ent).getHealth() <= 0) {
                                                         killed = true;
+                                                        if(ent.getDisplayName().equals("Bot")){
+                                                            ent.setHealth(100f);
+                                                        }
                                                     }
                                                     ((LivingEntity) ent).setNoDamageTicks(0);
                                                     p.playSound(loc, soundEffect, 1f, 1f);
                                                     p.playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
 
-                                                    //Create Death Message
+
                                                     if (killed) {
                                                         String deathMsg = ChatColor.AQUA + p.getDisplayName() +" ";
                                                         if(mc.blind) deathMsg = deathMsg.concat(ChatColor.WHITE +"鈃");
@@ -375,7 +408,6 @@ public class gun {
                                                         deathMsg = deathMsg.concat(" "+ChatColor.GREEN + ent.getDisplayName());
                                                         Bukkit.broadcastMessage(deathMsg);
                                                         p.playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
-                                                        //Clear Stored Hitboxes
                                                         mc.clearBoxs();
                                                     }
                                                 }
@@ -401,255 +433,206 @@ public class gun {
                 }
             }.runTaskAsynchronously(Artid.plug);
         }
+
     }
 
-    public void shootPing(int numShots){
-        if(isReloading && ammo>0){
-            isReloading=false;
+    public void shootPing(int numshots){
+        final boolean[] killed = new boolean[1];
+        final boolean[] walled = new boolean[1];
+        final boolean[] headshot = new boolean[1];
+        final boolean[] smoke = new boolean[1];
+        final boolean[] blind = new boolean[1];
+        ArrayList<Player> ents = new ArrayList<Player>();
+        if (isReloading && ammo > 0) {
+            isReloading = false;
         }
-        final boolean[] allKilled = {false};
-        for(int i = 0; i<numShots; i++) {
+
+        if(!cooldown) {
+            cooldown = true;
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!cooldown && !isReloading) {
-                        if (!item.getType().equals(Material.DIAMOND_SHOVEL)) {
-                            cooldown = true;
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    cooldown = false;
-                                }
-                            }.runTaskLater(Artid.plug, fireRate);
-                        }
-                        if (ammo >= 1) {
-                            ammo--;
-                            if (ammo != 0) item.setAmount(ammo);
-                            else reload();
-                            World w = Bukkit.getPlayer(playerUUID).getWorld();
-                            Player p = Bukkit.getPlayer(playerUUID);
-                            p.getInventory().setItemInMainHand(item);
-                            Location loc = p.getPlayer().getLocation();
-                            double rand;
+                    cooldown = false;
+                }
+            }.runTaskLater(Artid.plug, fireRate);
 
-                            if (p.getPlayer().isSneaking()) loc.add(0, p.getEyeHeight(), 0);
-                            if (!p.getPlayer().isSneaking()) loc.add(0, p.getEyeHeight(), 0);
-                            if (!p.getPlayer().isOnGround()) {
-                                rand = (Math.random() - .5) * (spread + 5);
-                                loc.setYaw(loc.getYaw() + (float) rand);
-                                loc.setPitch(loc.getPitch() - (recoil));
-                            } else {
-                                SecureRandom rando = new SecureRandom();
-                                switch (item.getType()) {
+            if (!isReloading) {
+                Bukkit.getPlayer(this.playerUUID).getWorld().playSound(Bukkit.getPlayer(this.playerUUID).getLocation(), soundEffect, 5f, 1f);
+                for (int i = 0; i < numshots; i++) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (!isReloading) {
+                                if (true) {
+                                    World w = Bukkit.getPlayer(playerUUID).getWorld();
+                                    Player p = Bukkit.getPlayer(playerUUID);
+                                    p.getInventory().setItem(slot, item);
+                                    Location loc = p.getPlayer().getLocation();
+                                    double rand;
 
-                                    default:
-                                        rand = (Math.random() - .5) * (spread);
+                                    if (p.getPlayer().isSneaking()) loc.add(0, p.getEyeHeight(), 0);
+                                    if (!p.getPlayer().isSneaking()) loc.add(0, p.getEyeHeight(), 0);
+                                    if (!p.getPlayer().isOnGround()) {
+                                        rand = (Math.random() - .5) * (spread + 10);
                                         loc.setYaw(loc.getYaw() + (float) rand);
-                                        loc.setPitch(loc.getPitch() - recoil);
-                                        break;
-                                    case NETHERITE_SWORD:
-                                        if (snipeState > 0) {
+                                        rand = (Math.random() - .5) * (spread + 10);
+                                        loc.setPitch(loc.getPitch() - (recoil) + (float) rand);
+                                    } else {
+                                        SecureRandom rando = new SecureRandom();
+                                        SecureRandom rando2 = new SecureRandom();
+                                        switch (item.getType()) {
 
-                                        } else {
-                                            rand = (Math.random() - .5) * (spread + 5);
-                                            loc.setYaw(loc.getYaw() + (float) rand);
-                                            rand = (Math.random() - .5) * (spread + 5);
-                                            loc.setPitch(loc.getPitch() + (float) rand);
+                                            default:
+                                                rand = (Math.random() - .5) * (spread);
+                                                loc.setYaw(loc.getYaw() + (float) rand);
+                                                loc.setPitch(loc.getPitch() - recoil);
+                                                break;
+                                            case DIAMOND_SHOVEL:
+                                            case WOODEN_AXE:
+                                                rand = (rando.nextFloat() - .5) * spread;
+                                                loc.setYaw(loc.getYaw() + (float) rand);
+                                                rand = (rando2.nextFloat() - .5) * spread;
+                                                loc.setPitch(loc.getPitch() + (float) rand);
+                                                break;
                                         }
-                                        break;
-                                    case DIAMOND_SHOVEL:
-                                        rand = (ThreadLocalRandom.current().nextFloat() - .5) * spread;
-                                        loc.setYaw(loc.getYaw() + (float) rand);
-                                        loc.setPitch(loc.getPitch() + (float) rand);
-                                        break;
-                                    case GOLDEN_AXE:
-                                        rand = (rando.nextFloat() - .5) * (spread);
-                                        loc.setYaw(loc.getYaw() + (float) rand);
-                                        rand = (rando.nextFloat() - .5) * (spread);
-                                        loc.setPitch((float) (loc.getPitch() - recoil + rand));
-                                        break;
-                                }
-                            }
+                                    }
 
 
-                            rayTracer ray = new rayTracer(loc.toVector(), loc.getDirection());
-                            ray.highlight(w, p, 100, 1);
-                            w.playSound(loc, soundEffect, 5f, 1f);
-                            new BukkitRunnable() {
-                                boolean killed = false;
-                                boolean headShot = false;
+                                    rayTracer ray = new rayTracer(loc.toVector(), loc.getDirection());
+                                    ray.highlight(w, p, 100, 1);
+                                    new BukkitRunnable() {
+                                        @Override
+                                        public void run() {
+                                            double fallOff;
+                                            for (Map.Entry<String, mcgoPlayer> entry : Artid.mcPlayers.entrySet()) {
+                                                mcgoPlayer mc = entry.getValue();
+                                                Player ent = mc.player;
 
-                                @Override
-                                public void run() {
-                                    for (Map.Entry<String, mcgoPlayer> entry : Artid.mcPlayers.entrySet()) {
-                                        mcgoPlayer mc = entry.getValue();
-                                        Player ent = mc.player;
-                                        if (!ent.isDead()) {
-                                            int ping = (((CraftPlayer) Bukkit.getPlayer(playerUUID)).getHandle().ping);
-                                            BoundingBox box;
-                                            if (mc.getBox((ping / 50) + 4) != null) {
-                                                box = mc.getBox((ping / 50) + 4);
-                                            } else return;
-                                            if (ray.intersects(box, 200, .05, w,p)) {
-                                                if (ent.getName() != p.getName() && ent instanceof Player) {
-                                                    BoundingBox head = box.clone();
-                                                    head.shift(0, ((LivingEntity) ent).getEyeHeight() - .15, 0);
-                                                    if (head.contains(ray.getPos()) || ray.intersects(head, 100, .05,w,p)) {
-                                                        ((LivingEntity) ent).damage((damage * 2 / 5) - (ray.getWalls() / 20));
-                                                        //damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,damage*2/20);
-                                                        ent.setNoDamageTicks(0);
-                                                        headShot = true;
-                                                        p.playSound(p.getLocation(), "mcgo.random.headshot_shooter", 1, 1);
-                                                        ent.playSound(ent.getLocation(), "mcgo.random.headshot_victim", 1, 1);
-                                                    } else {
-                                                        ((LivingEntity) ent).damage((damage / 5) - ray.getWalls() / 20);
-                                                        //damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,damage/20);
-                                                        ent.setNoDamageTicks(0);
-                                                    }
-                                                    if (((LivingEntity) ent).getHealth() <= 0) {
-                                                        killed = true;
-                                                    }
-                                                    ((LivingEntity) ent).setNoDamageTicks(0);
-                                                    p.playSound(loc, soundEffect, 1f, 1f);
-                                                    p.playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
 
-                                                    if (killed && !allKilled[0]) {
-                                                        if (headShot) {
-                                                            if (ray.getWalls() > 0) {
-                                                                Bukkit.broadcastMessage(ChatColor.BOLD + (ChatColor.AQUA + p.getPlayer().getName() + ChatColor.WHITE + " " + gunImg + "鈀鉰 " + ChatColor.GREEN + ent.getName()));
-                                                                p.playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
-                                                                allKilled[0] =true;
+                                                if (!ent.isDead()) {
+                                                    int ping = (((CraftPlayer) Bukkit.getPlayer(playerUUID)).getHandle().ping);
+                                                    BoundingBox box;
+                                                    if (mc.getBox((ping / 50) + 3) != null) {
+                                                        box = mc.getBox((ping / 50) + 4);
+                                                    } else return;
+                                                    if (ray.intersects(box, 200, .05, w, p)) {
+                                                        fallOff = Math.floor(ent.getLocation().distance(p.getLocation()) * fallOffAmount);
+                                                        if (ent.getName() != p.getName() && ent instanceof Player) {
+                                                            BoundingBox head = box.clone();
+                                                            head.shift(0, ((LivingEntity) ent).getEyeHeight() - .2, 0);
+                                                            if (head.contains(ray.getPos()) || ray.intersects(head, 100, .05, w, p)) {
+                                                                if (ray.getWalls() > 0) {
+                                                                    if(ent.getDisplayName().equals("Bot")){
+                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damage) * 2 * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                    }
+                                                                    else {
+                                                                        ((LivingEntity) ent).damage(((((damage) * 2 * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5));
+                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damage) * 2 * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                    }
+                                                                } else {
+                                                                    if(ent.getDisplayName().equals("Bot")){
+                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (((damage) * 2) - fallOff)));
+                                                                    }
+                                                                    else {
+                                                                        ((LivingEntity) ent).damage((((damage) * 2) - fallOff) / 5);
+                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (((damage) * 2) - fallOff)));
+                                                                    }
+                                                                }
+
+                                                                ent.setNoDamageTicks(0);
+                                                                headshot[0] = true;
+                                                                p.playSound(p.getLocation(), "mcgo.random.headshot_shooter", 1, 1);
+                                                                ent.playSound(ent.getLocation(), "mcgo.random.headshot_victim", 1, 1);
                                                             } else {
-                                                                Bukkit.broadcastMessage(ChatColor.BOLD + (ChatColor.AQUA + p.getPlayer().getName() + ChatColor.WHITE + " " + gunImg + "鉰 " + ChatColor.GREEN + ent.getName()));
-                                                                p.playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
-                                                                allKilled[0] =true;
+                                                                if (ray.getWalls() > 0) {
+                                                                    if(ent.getDisplayName().equals("Bot")){
+                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damage) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                    }
+                                                                    else {
+                                                                        ((LivingEntity) ent).damage((((damage) * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5);
+                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damage) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                    }
+                                                                } else {
+                                                                    if(ent.getDisplayName().equals("Bot")){
+                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damage - fallOff)));
+                                                                    }
+                                                                    else {
+                                                                        ((LivingEntity) ent).damage((((damage)) - fallOff) / 5);
+                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damage - fallOff)));
+                                                                    }
+                                                                }
+                                                                ent.setNoDamageTicks(0);
                                                             }
-                                                        } else {
-                                                            if (ray.getWalls() > 0) {
-                                                                Bukkit.broadcastMessage(ChatColor.BOLD + (ChatColor.AQUA + p.getPlayer().getName() + ChatColor.WHITE + " " + gunImg + "鈀 " + ChatColor.GREEN + ent.getName()));
-                                                                p.playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
-                                                                allKilled[0] =true;
-                                                            } else {
-                                                                Bukkit.broadcastMessage(ChatColor.BOLD + (ChatColor.AQUA + p.getPlayer().getName() + ChatColor.WHITE + " " + gunImg + " " + ChatColor.GREEN + ent.getName()));
-                                                                p.playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
-                                                                allKilled[0] =true;
+                                                            if (((LivingEntity) ent).getHealth() <= 0) {
+                                                                killed[0] = true;
+                                                            }
+                                                            ((LivingEntity) ent).setNoDamageTicks(0);
+                                                            p.playSound(loc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
+
+
+                                                            if (killed[0]) {
+                                                                if (!ents.contains(ent)) ents.add(ent);
+                                                                if (mc.blind) blind[1] = true;
+                                                                if (ray.isThroughSmoke()) smoke[0] = true;
+                                                                if (ray.getWalls() > 0) walled[0] = true;
                                                             }
                                                         }
                                                     }
                                                 }
+
+                                            }
+                                            if (p.getInventory().getItemInMainHand().getType().equals(Material.NETHERITE_SWORD)) {
+                                                snipeState = 0;
+                                                unScope();
                                             }
                                         }
-
+                                    }.runTask(Artid.plug);
+                                    if (recoil < maxRecoil) {
+                                        recoil += .5;
                                     }
-                                    if (p.getInventory().getItemInMainHand().getType().equals(Material.NETHERITE_SWORD)) {
-                                        snipeState = 0;
-                                        unScope();
-                                    }
-
+                                    recoilCount = 20;
                                 }
-                            }.runTask(Artid.plug);
-                            if (recoil < maxRecoil) {
-                                recoil += .5;
-                            }
-                            recoilCount = 20;
-                            if (ammo < 1) {
-                                reload();
                             }
                         }
-                    }
+                    }.runTaskAsynchronously(Artid.plug);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            for (Player ent : ents) {
+                                ents.remove(ent);
+                                Player p = Bukkit.getPlayer(playerUUID);
+                                String deathMsg = ChatColor.AQUA + Bukkit.getPlayer(playerUUID).getDisplayName() + " ";
+                                if (blind[0]) deathMsg = deathMsg.concat(ChatColor.WHITE + "鈃");
+                                if ((gunImg.equals("銄銅") || gunImg.equals("銘銙")) && snipeState == 0)
+                                    deathMsg = deathMsg.concat(ChatColor.WHITE + "鈄");
+                                deathMsg = deathMsg.concat(ChatColor.WHITE + gunImg);
+                                if (smoke[0]) deathMsg = deathMsg.concat("鈂");
+                                if (walled[0]) deathMsg = deathMsg.concat("鈀");
+                                if (headshot[0]) deathMsg = deathMsg.concat("鉰");
+
+                                deathMsg = deathMsg.concat(" " + ChatColor.GREEN + ent.getDisplayName());
+                                Bukkit.broadcastMessage(deathMsg);
+                                p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
+                                Artid.mcPlayers.get(ent.getUniqueId().toString()).clearBoxs();
+                            }
+                        }
+                    }.runTaskLater(Artid.plug, 5);
                 }
-            }.runTaskAsynchronously(Artid.plug);
+            }
         }
-
-    }
-
-
-
-
-    public void setSpread(float s){
-        spread = s;
-    }
-    public void setMaxRecoil(float r){
-        maxRecoil = r;
-    }
-    public int getSnipeState(){
-        return snipeState;
-    }
-    public void setSnipeState(int i){
-        snipeState = i;
-    }
-    public void setTimeSinceClick(float time){
-        timeSinceClick = time;
-    }
-    public void updateItem(){
-        //Bukkit.getPlayer(playerUUID).getInventory().setItem(slot,item);
-        Bukkit.getPlayer(playerUUID).updateInventory();
-        if(item.getType().equals(Material.GOLDEN_AXE) && snipeState > 0){
-            final List<Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack>> equipmentList = new ArrayList<>();
-            equipmentList.add(new Pair<>(EnumItemSlot.HEAD, new net.minecraft.server.v1_16_R3.ItemStack(Blocks.CARVED_PUMPKIN)));
-            PacketPlayOutEntityEquipment pack = new PacketPlayOutEntityEquipment(Bukkit.getPlayer(playerUUID).getEntityId(), equipmentList);
-            ((CraftPlayer)Bukkit.getPlayer(playerUUID)).getHandle().playerConnection.sendPacket(pack);
+        if (ammo >= 1) {
+            ammo--;
+            if (ammo != 0) item.setAmount(ammo);
         }
-    }
-    public int getAmmo() {
-        return ammo;
-    }
-    public float getFireRate() {
-        return fireRate;
-    }
-    public void setFireRate(int fireRate) {
-        this.fireRate = fireRate;
-    }
-    public float getDamage() {
-        return damage;
-    }
-    public void setDamage(float damage) {
-        this.damage = damage;
-    }
-    public int getMaxAmmo() {
-        return maxAmmo;
-    }
-    public void setAmmo(int ammo){
-        this.ammo=ammo;
-    }
-    public void setMaxAmmo(int maxAmmo) {
-        this.maxAmmo = maxAmmo;
-    }
-    public ItemStack getItem() {
-        return item;
-    }
-    public void setItem(ItemStack item) {
-        this.item = item;
-    }
-    public float getRecoil() {
-        return recoil;
-    }
-    public void setRecoil(float recoil) {
-        this.recoil = recoil;
-    }
-    public String getSoundEffect() {
-        return soundEffect;
-    }
-    public void setSoundEffect(String soundEffect) {
-        this.soundEffect = soundEffect;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public boolean getCooldown(){
-        return cooldown;
-    }
-    public void setCooldown(boolean c){
-        cooldown = c;
-    }
-    public boolean getIsReloading(){
-        return isReloading;
-    }
-    public void setIsReloading(boolean s){
-        isReloading = s;
+        if(ammo==0){
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    reload();
+                }
+            }.runTaskLater(Artid.plug, 2);
+
+        }
     }
 }
 
