@@ -63,7 +63,13 @@ public class nadeBlow extends BukkitRunnable {
         for(Entity e : Loc.getWorld().getNearbyEntities(Loc,14,10,14)){
             if(e instanceof Player) {
                 if (e.getLocation().distance(Loc) < 7) {
-                    ((CraftPlayer) e).damage(25 - (e.getLocation().distance(Loc) * 4.0));
+                    if(((CraftPlayer) e).getHealth() - (25 - (e.getLocation().distance(Loc) * 4.0)) > 0){
+                        ((CraftPlayer) e).damage(25 - (e.getLocation().distance(Loc) * 4.0));
+                    }
+                    else{
+                        ((CraftPlayer) e).damage(20);
+                        Bukkit.broadcastMessage(ChatColor.AQUA + ar.getName() + ChatColor.WHITE + " 銃 " + ChatColor.GREEN + ((CraftPlayer) e).getDisplayName());
+                    }
                 }
             }
         }

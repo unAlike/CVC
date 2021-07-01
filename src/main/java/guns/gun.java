@@ -77,10 +77,12 @@ public class gun {
             }
         }.runTaskTimer(Artid.plug, 0,1);
         new BukkitRunnable(){
+            final Player p = Bukkit.getPlayer(playerUUID);
+            final World w = Bukkit.getPlayer(playerUUID).getWorld();
             @Override
             public void run() {
                 if(Bukkit.getPlayer(playerUUID).getInventory().getItemInMainHand().equals(item) && timeSinceClick<5) {
-                    shootPing();
+                    shootPing(w,p);
                 }
             }
         }.runTaskTimer(Artid.plug, 0, fireRate);
@@ -238,11 +240,12 @@ public class gun {
         isReloading = s;
     }
 
-    public void shootPing(){
+    public void shootPing(World w, Player p){
         if(isReloading && ammo>0){
             isReloading=false;
         }
         if(!isReloading){
+            Location loc = p.getLocation();
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -260,10 +263,9 @@ public class gun {
                             ammo--;
                             if (ammo != 0) item.setAmount(ammo);
                             else reload();
-                            World w = Bukkit.getPlayer(playerUUID).getWorld();
-                            Player p = Bukkit.getPlayer(playerUUID);
+//                            World w = Bukkit.getPlayer(playerUUID).getWorld();
+//                            Player p = Bukkit.getPlayer(playerUUID);
                             p.getInventory().setItem(slot, item);
-                            Location loc = p.getPlayer().getLocation();
                             double rand;
 
                             if (p.getPlayer().isSneaking()) loc.add(0, p.getEyeHeight(), 0);
@@ -325,7 +327,7 @@ public class gun {
                                         if (!ent.isDead()) {
                                             int ping = (((CraftPlayer) Bukkit.getPlayer(playerUUID)).getHandle().ping);
                                             BoundingBox box;
-                                            if (mc.getBox((ping / 50) + 3) != null) {
+                                            if (mc.getBox((ping / 50) + 4) != null) {
                                                 box = mc.getBox((ping / 50) + 4);
                                             } else return;
                                             if (ray.intersects(box, 200, .05, w, p)) {

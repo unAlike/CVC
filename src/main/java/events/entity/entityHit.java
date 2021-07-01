@@ -4,6 +4,7 @@ import groupid.artid.Artid;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftSnowball;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -20,14 +21,22 @@ import runnables.molly;
 import runnables.nadeBlow;
 
 public class entityHit implements Listener {
-    final float bounce =.5f;
+    float bounce =.5f;
     Material lastMaterial;
     boolean molley = false;
     @EventHandler
     public void snowballHit(ProjectileHitEvent e){
+        Player p = (Player) e.getEntity().getShooter();
+        if(Artid.mcPlayers.get(p.getUniqueId().toString()).hypixelNades){
+            bounce = .25f;
+        }
+        else{
+            bounce = .5f;
+        }
         molley = false;
         if(e.getHitEntity() instanceof Player){
             for (Entity ar : e.getEntity().getPassengers()) {
+                ar.setCustomName(p.getDisplayName());
                 if (ar instanceof ArmorStand) {
                     switch(((ArmorStand) ar).getEquipment().getItemInMainHand().getType()){
                         case OAK_SAPLING:
@@ -63,6 +72,7 @@ public class entityHit implements Listener {
             if(e.getEntity().getVelocity().getY() < .2 && e.getEntity().getVelocity().getY() > -.2 && e.getHitBlockFace().equals(BlockFace.UP)){
                 //e.getEntity().getPassengers().remove(0);
                 e.getEntity().remove();
+                e.getEntity().getPassengers().get(0).setCustomName(p.getDisplayName());
             }
             else {
                 for (Entity ent : e.getEntity().getPassengers()) {
@@ -124,6 +134,8 @@ public class entityHit implements Listener {
                     as.setInvulnerable(true);
                     as.setMarker(true);
                     as.setInvulnerable(true);
+                    as.setCustomName(p.getDisplayName());
+                    as.setCustomNameVisible(false);
                     as.addEquipmentLock(EquipmentSlot.HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
                     as.addEquipmentLock(EquipmentSlot.HAND, ArmorStand.LockType.ADDING_OR_CHANGING);
                     as.addEquipmentLock(EquipmentSlot.HEAD, ArmorStand.LockType.ADDING_OR_CHANGING);

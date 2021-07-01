@@ -41,7 +41,7 @@ public class playerPickupItem implements Listener {
                     e.setCancelled(true);
                     e.getPlayer().getInventory().setItem(1, e.getItem().getItemStack());
                     e.getItem().remove();
-                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setOffhand(new gun(10, 40, 40, 7, e.getItem().getItemStack().getAmount(), new ItemStack(Material.GOLDEN_PICKAXE, e.getItem().getItemStack().getAmount()), 2.5f, 1, "mcgo.weapons.magnumshot", "Deagle", "鉡",e.getPlayer(),1,1f));
+                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setOffhand(new gun(10, 40, 40, 7, e.getItem().getItemStack().getAmount(), new ItemStack(Material.GOLDEN_PICKAXE, e.getItem().getItemStack().getAmount()), 2.5f, 1, "mcgo.weapons.magnumshot", "Deagle", "鉡",e.getPlayer(),1,.1f));
                     Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getOffhand().updateItem();
                     break;
             }
@@ -66,7 +66,7 @@ public class playerPickupItem implements Listener {
                     e.setCancelled(true);
                     e.getPlayer().getInventory().setItem(0, e.getItem().getItemStack());
                     e.getItem().remove();
-                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setMain(new gun(3, 50, 20, 35, e.getItem().getItemStack().getAmount(), new ItemStack(Material.GOLDEN_SHOVEL, e.getItem().getItemStack().getAmount()), 3, 2, "mcgo.weapons.smgshot", "P90", "銒銓", e.getPlayer(), 0, 2));
+                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setMain(new gun(3, 50, 20, 35, e.getItem().getItemStack().getAmount(), new ItemStack(Material.GOLDEN_SHOVEL, e.getItem().getItemStack().getAmount()), 3, 2, "mcgo.weapons.smgshot", "P90", "銒銓", e.getPlayer(), 0, .1f));
                     Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).giveMainGun();
                     break;
                 //MPP%
@@ -74,7 +74,7 @@ public class playerPickupItem implements Listener {
                     e.setCancelled(true);
                     e.getPlayer().getInventory().setItem(0, e.getItem().getItemStack());
                     e.getItem().remove();
-                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setMain(new gun(2, 40, 10, 40, e.getItem().getItemStack().getAmount(), new ItemStack(Material.STONE_SHOVEL, e.getItem().getItemStack().getAmount()), 5, 7, "mcgo.weapons.smgshot", "MP5", "鉢", e.getPlayer(), 0, 2));
+                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setMain(new gun(2, 40, 10, 40, e.getItem().getItemStack().getAmount(), new ItemStack(Material.STONE_SHOVEL, e.getItem().getItemStack().getAmount()), 5, 7, "mcgo.weapons.smgshot", "MP5", "鉢", e.getPlayer(), 0, .1f));
                     Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).giveMainGun();
                     break;
                 case STONE_HOE:
@@ -88,28 +88,28 @@ public class playerPickupItem implements Listener {
                     e.setCancelled(true);
                     e.getPlayer().getInventory().setItem(0, e.getItem().getItemStack());
                     e.getItem().remove();
-                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setMain(new gun(3, 50, 36, 30, e.getItem().getItemStack().getAmount(), new ItemStack(Material.IRON_AXE, e.getItem().getItemStack().getAmount()), 3, 2.5f, "mcgo.weapons.carbineshot", "M4", "銈銉", e.getPlayer(), 0, 2));
+                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setMain(new gun(3, 50, 36, 30, e.getItem().getItemStack().getAmount(), new ItemStack(Material.IRON_AXE, e.getItem().getItemStack().getAmount()), 3, 2.5f, "mcgo.weapons.carbineshot", "M4", "銈銉", e.getPlayer(), 0, .2f));
                     Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).giveMainGun();
                     break;
                 case GOLDEN_AXE:
                     e.setCancelled(true);
                     e.getPlayer().getInventory().setItem(0, e.getItem().getItemStack());
                     e.getItem().remove();
-                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setMain(new gun(2, 50, 30, 30, e.getItem().getItemStack().getAmount(), new ItemStack(Material.GOLDEN_AXE, e.getItem().getItemStack().getAmount()), 8, 12, "mcgo.weapons.akshot", "AUG", "銘銙", e.getPlayer(), 0, 1));
+                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setMain(new gun(2, 50, 30, 30, e.getItem().getItemStack().getAmount(), new ItemStack(Material.GOLDEN_AXE, e.getItem().getItemStack().getAmount()), 8, 12, "mcgo.weapons.akshot", "AUG", "銘銙", e.getPlayer(), 0, .1f));
                     Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).giveMainGun();
                     break;
                 case DIAMOND_SHOVEL:
                     e.setCancelled(true);
                     e.getPlayer().getInventory().setItem(0, e.getItem().getItemStack());
                     e.getItem().remove();
-                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setMain(new gun(20, 40, 30, 8, 8, new ItemStack(Material.DIAMOND_SHOVEL, e.getItem().getItemStack().getAmount()), 0, 10, "mcgo.weapons.shotgunshot", "Pump", "銊銋", e.getPlayer(), 0, 1));
+                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setMain(new gun(20, 40, 30, 8, 8, new ItemStack(Material.DIAMOND_SHOVEL, e.getItem().getItemStack().getAmount()), 0, 10, "mcgo.weapons.shotgunshot", "Pump", "銊銋", e.getPlayer(), 0, .1f));
                     Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).giveMainGun();
                     break;
                 case WOODEN_AXE:
                     e.setCancelled(true);
                     e.getPlayer().getInventory().setItem(0, e.getItem().getItemStack());
                     e.getItem().remove();
-                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setMain(new gun(10, 40, 30, 10, 10, new ItemStack(Material.WOODEN_AXE, e.getItem().getItemStack().getAmount()), 0, 15, "mcgo.weapons.shotgunshot", "Spas", "銜銝", e.getPlayer(), 0, 2));
+                    Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setMain(new gun(10, 40, 30, 10, 10, new ItemStack(Material.WOODEN_AXE, e.getItem().getItemStack().getAmount()), 0, 15, "mcgo.weapons.shotgunshot", "Spas", "銜銝", e.getPlayer(), 0, .2f));
                     Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).giveMainGun();
                     break;
             }

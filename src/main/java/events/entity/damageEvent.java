@@ -58,7 +58,10 @@ public class damageEvent implements Listener {
                         if(((Player) e.getEntity()).getHealth()-4 >= 0) {
                             ((Player) e.getEntity()).setHealth(((Player) e.getEntity()).getHealth() - 4);
                         }
-                        else ((Player) e.getEntity()).damage((double)20);
+                        else {
+                            ((Player) e.getEntity()).damage((double)20);
+                            Bukkit.broadcastMessage(ChatColor.AQUA + ((Player) ((EntityDamageByEntityEvent) e).getDamager()).getDisplayName() + ChatColor.WHITE + " 銌 " + ChatColor.GREEN + ((Player) e.getEntity()).getDisplayName());
+                        }
                         damageMarker(e.getEntity().getLocation(), ((CraftWorld)(e.getEntity().getWorld())).getHandle(), ((Player) ((EntityDamageByEntityEvent) e).getDamager()).getPlayer(), 4*5);
                     }
                     else e.setCancelled(true);

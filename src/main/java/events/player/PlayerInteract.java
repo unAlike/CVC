@@ -56,7 +56,7 @@ public class PlayerInteract implements Listener {
                     case NETHERITE_SWORD:
                         if(Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain()!=null) {
                             if(!Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain().getCooldown() && !Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain().getIsReloading()) {
-                                p.getMain().shootPing();
+                                p.getMain().shootPing(e.getPlayer().getWorld(),e.getPlayer());
                                 e.setCancelled(true);
                             }
                         }
@@ -87,19 +87,19 @@ public class PlayerInteract implements Listener {
                     case WOODEN_PICKAXE: case GOLDEN_PICKAXE:
                         if(Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getOffhand()!=null) {
                             e.setCancelled(true);
-                            p.getOffhand().shootPing();
+                            p.getOffhand().shootPing(e.getPlayer().getWorld(),e.getPlayer());
                         }
                         break;
                     case STONE_PICKAXE:
                         if(Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getOffhand()!=null) {
                             e.setCancelled(true);
                             if(!p.getOffhand().getCooldown()) {
-                                p.getOffhand().shootPing();
+                                p.getOffhand().shootPing(e.getPlayer().getWorld(),e.getPlayer());
                                 new BukkitRunnable() {
                                     @Override
                                     public void run() {
                                         p.getOffhand().setCooldown(false);
-                                        p.getOffhand().shootPing();
+                                        p.getOffhand().shootPing(e.getPlayer().getWorld(),e.getPlayer());
                                     }
                                 }.runTaskLater(Artid.plug, 4);
                             }
@@ -170,6 +170,7 @@ public class PlayerInteract implements Listener {
         e.setCancelled(true);
 
         Snowball ball = e.getPlayer().getWorld().spawn(p.getEyeLocation(), Snowball.class);
+        ball.setCustomName(e.getPlayer().getDisplayName());
         ItemStack item = new ItemStack(m);
 
         ball.setShooter(e.getPlayer());

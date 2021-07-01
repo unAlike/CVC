@@ -62,9 +62,10 @@ public class rayTracer {
         outer: for (double d = 0; d <= blocksAway; d += accuracy) {
             Vector pos = getPosition(d);
             for(Player p : world.getPlayers()){
-                if(p.getBoundingBox().contains(pos) && p!=player) {
-                    positions.add(getPosition(d+accuracy));
-                    positions.add(getPosition(d+(accuracy*2)));
+                if(Artid.mcPlayers.get(p.getUniqueId().toString()).player.getBoundingBox().contains(pos) && Artid.mcPlayers.get(p.getUniqueId().toString()).player!=player) {
+                    for(int i=0; i<100; i++){
+                        positions.add(getPosition(d+(accuracy*i)));
+                    }
                     return positions;
                 }
             }
@@ -164,7 +165,7 @@ public class rayTracer {
                 case AIR: case CAVE_AIR: case WATER: case GRASS: case TALL_GRASS: case SNOW: case FIRE: case BARRIER: case SPRUCE_SIGN: case OAK_SIGN: case BIRCH_SIGN:
                 case JUNGLE_SIGN: case DARK_OAK_SIGN: case BLACK_CARPET: case BLUE_CARPET: case BROWN_CARPET: case CYAN_CARPET: case GRAY_CARPET: case GREEN_CARPET: case LIGHT_BLUE_CARPET:
                 case LIGHT_GRAY_CARPET: case LIME_CARPET: case MAGENTA_CARPET: case ORANGE_CARPET: case PINK_CARPET: case PURPLE_CARPET: case RED_CARPET: case WHITE_CARPET:
-                case YELLOW_CARPET: case TRIPWIRE: case TRIPWIRE_HOOK:
+                case YELLOW_CARPET: case TRIPWIRE: case TRIPWIRE_HOOK: case IRON_BARS:
 
 
 

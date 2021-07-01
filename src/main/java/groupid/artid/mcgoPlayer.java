@@ -8,6 +8,7 @@ import net.minecraft.server.v1_16_R3.EnumItemSlot;
 import net.minecraft.server.v1_16_R3.ItemStack;
 import net.minecraft.server.v1_16_R3.PacketPlayOutEntityEquipment;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -24,6 +25,7 @@ public class mcgoPlayer {
     public String UUID;
     public Player player;
     LinkedList<BoundingBox> boxs = new LinkedList<BoundingBox>();
+    LinkedList<Location> locs = new LinkedList<Location>();
 
     public gun main;
     public gun offhand;
@@ -60,6 +62,10 @@ public class mcgoPlayer {
                 if(boxs.size()>100){
                     boxs.remove(boxs.getLast());
                 }
+                locs.push(player.getLocation());
+                if(locs.size()>5){
+                    locs.remove(locs.getLast());
+                }
             }
         }.runTaskTimer(Artid.plug,0,1);
         new BukkitRunnable(){
@@ -95,6 +101,9 @@ public class mcgoPlayer {
     }
     public BoundingBox getBox(int ticks){
         return boxs.get(ticks);
+    }
+    public Location getLoc(int ticks){
+        return locs.get(ticks);
     }
     public void clearBoxs(){
         boxs.clear();
