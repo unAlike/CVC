@@ -25,7 +25,7 @@ public class CVCBot extends EntityPlayer {
         for(Player all : Bukkit.getOnlinePlayers()){
             PlayerConnection connection = ((CraftPlayer)all).getHandle().playerConnection;
             connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, this));
-            connection.sendPacket(new PacketPlayOutEntityEffect(this.getId(),new MobEffect(MobEffectList.fromId(24), 1000000000, 10000000,true,true)));
+            connection.sendPacket(new PacketPlayOutEntityEffect(this.getId(),new MobEffect(MobEffectList.fromId(24), 100000, 1,true,true)));
             connection.sendPacket(new PacketPlayOutNamedEntitySpawn(this));
         }
     }

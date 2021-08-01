@@ -4,7 +4,6 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import groupid.artid.Artid;
 import groupid.artid.mcgoPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
@@ -22,6 +21,9 @@ public class playerChangeItem implements Listener {
         mcgoPlayer mplayer = Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString());
         if(e.getNewSlot()==0 && mplayer.getMain()!=null){
             mplayer.getMain().setCooldown(true);
+            if(mplayer.getMain().getItem().getType().equals(Material.NETHERITE_SWORD) || mplayer.getMain().getItem().getType().equals(Material.GOLDEN_AXE)){
+
+            }
             new BukkitRunnable(){
                 @Override
                 public void run() {
@@ -42,18 +44,47 @@ public class playerChangeItem implements Listener {
             switch (e.getPlayer().getInventory().getItem(e.getNewSlot()).getType()) {
                 default:
                     e.getPlayer().setExp(0.0001f);
+                    e.getPlayer().setWalkSpeed(.2f);
                     break;
                 case OAK_SAPLING: case DARK_OAK_SAPLING: case BIRCH_SAPLING: case ACACIA_SAPLING: case JUNGLE_SAPLING:
                     if(!Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).hypixelNades) {
                         e.getPlayer().setExp(.5f);
                     }
                     break;
+                    //m4 SR
+                case IRON_AXE: case GOLDEN_AXE:
+                    ((CraftPlayer)e.getPlayer()).setWalkSpeed(.178f);
+                    break;
+                    //p90 Scout AK
+                case GOLDEN_SHOVEL: case NETHERITE_SWORD: case STONE_HOE:
+                    ((CraftPlayer)e.getPlayer()).setWalkSpeed(.18f);
+                    break;
+                    //PUMP SPAS
+                case DIAMOND_SHOVEL: case WOODEN_AXE:
+                    ((CraftPlayer)e.getPlayer()).setWalkSpeed(.182f);
+                    break;
+                    //DEAG MP5
+                case GOLDEN_PICKAXE: case STONE_SHOVEL:
+                    ((CraftPlayer)e.getPlayer()).setWalkSpeed(.184f);
+                    break;
+                    //USP HK
+                case WOODEN_PICKAXE: case STONE_PICKAXE:
+                    ((CraftPlayer)e.getPlayer()).setWalkSpeed(.19f);
+                    break;
+                    //Knife
+                case BONE:
+                    ((CraftPlayer)e.getPlayer()).setWalkSpeed(.205f);
+                    break;
+
+
             }
-        }else e.getPlayer().setExp(0.0001f);
+        }else {
+            e.getPlayer().setExp(0.0001f);
+            e.getPlayer().setWalkSpeed(.2f);
+        }
 
         mcgoPlayer mcPlayer = Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString());
         CraftPlayer player = (CraftPlayer) e.getPlayer();
-        player.setWalkSpeed(0.2f);
         PacketContainer FOV = new PacketContainer(PacketType.Play.Server.ABILITIES);
         FOV.getFloat().write(0,.05f);
         FOV.getBooleans().write(2, player.getAllowFlight());
@@ -66,6 +97,8 @@ public class playerChangeItem implements Listener {
             throw new RuntimeException(
                     "Cannot send packet " + FOV, ex);
         }
+
+
     }
     @EventHandler
     public void altHandSwap(PlayerSwapHandItemsEvent e){

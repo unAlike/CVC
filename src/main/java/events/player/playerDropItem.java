@@ -22,7 +22,7 @@ public class playerDropItem implements Listener {
                 Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setOffhand(null);
                 e.getPlayer().getInventory().setItem(1,new ItemStack(Material.AIR));
                 break;
-            case STONE_SHOVEL: case GOLDEN_SHOVEL: case IRON_AXE: case NETHERITE_SWORD: case GOLDEN_AXE: case STONE_HOE: case DIAMOND_SHOVEL: case WOODEN_AXE:
+            case STONE_SHOVEL: case GOLDEN_SHOVEL: case IRON_AXE: case NETHERITE_SWORD: case GOLDEN_AXE: case STONE_HOE: case DIAMOND_SHOVEL: case WOODEN_AXE: case NETHERITE_SHOVEL:
                 e.getItemDrop().getItemStack().setAmount(e.getPlayer().getInventory().getItem(0).getAmount()+1);
                 mc.getMain().setIsReloading(false);
                 Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).setMain(null);

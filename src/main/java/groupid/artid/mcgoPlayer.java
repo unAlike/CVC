@@ -2,28 +2,27 @@ package groupid.artid;
 
 import com.mojang.datafixers.util.Pair;
 import guns.gun;
-import guns.gunTypes;
+import mcgoScoreboard.mcgoScoreboard;
+import mcgoScoreboard.lobbyScoreboard;
 import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.EnumItemSlot;
-import net.minecraft.server.v1_16_R3.ItemStack;
 import net.minecraft.server.v1_16_R3.PacketPlayOutEntityEquipment;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class mcgoPlayer {
     public String name;
     public String UUID;
     public Player player;
+    public int mcVersion;
+    public java.util.UUID gameUUID;
+
     LinkedList<BoundingBox> boxs = new LinkedList<BoundingBox>();
     LinkedList<Location> locs = new LinkedList<Location>();
 
@@ -32,16 +31,47 @@ public class mcgoPlayer {
     public boolean blind = false;
     public boolean onFire;
     public boolean hypixelNades = false;
+    public boolean famasOnCooldown = false;
+    public boolean hkOnCooldown = false;
+    public boolean ready;
+    public int kills;
+    public int killStreak;
+    public int deaths;
+    public int assists;
+    public int money;
+
+
+    public mcgoScoreboard gamesb;
+    public lobbyScoreboard lobbysb;
+
 
 
     public mcgoPlayer(Player p){
+        this.gameUUID= null;
         this.name = p.getName();
         this.UUID = p.getUniqueId().toString();
         this.player = p;
-        onFire = false;
-        main=null;
-        offhand=null;
+        this.onFire = false;
+        this.main=null;
+        this.offhand=null;
+        this.money = 0;
+        this.kills=0;
+        this.killStreak=0;
+        this.deaths=0;
+        this.assists=0;
+        this.ready = false;
 
+        this.gamesb = new mcgoScoreboard(this);
+        this.lobbysb = new lobbyScoreboard(this);
+
+
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                gamesb.update();
+                lobbysb.update();
+            }
+        }.runTaskTimer(Artid.plug,0,20);
 
         new BukkitRunnable(){
             @Override
@@ -94,7 +124,7 @@ public class mcgoPlayer {
     }
     public void giveMainGun(){
         player.getInventory().setItem(0, main.getItem());
-        main.updateItem();
+        main.updateItem(0);
     }
     public void giveOffhandGun(){player.getInventory().setItem(1, offhand.getItem());
         offhand.updateItem();
@@ -107,5 +137,12 @@ public class mcgoPlayer {
     }
     public void clearBoxs(){
         boxs.clear();
+    }
+    public void setGameUUID(UUID id){
+        this.gameUUID = id;
+    }
+
+    public int getMoney() {
+        return money;
     }
 }

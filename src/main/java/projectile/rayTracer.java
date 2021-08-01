@@ -11,8 +11,6 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -62,8 +60,9 @@ public class rayTracer {
         outer: for (double d = 0; d <= blocksAway; d += accuracy) {
             Vector pos = getPosition(d);
             for(Player p : world.getPlayers()){
-                if(Artid.mcPlayers.get(p.getUniqueId().toString()).player.getBoundingBox().contains(pos) && Artid.mcPlayers.get(p.getUniqueId().toString()).player!=player) {
-                    for(int i=0; i<100; i++){
+                if(Artid.mcPlayers.get(p.getUniqueId().toString()).getBox(4 + ((((CraftPlayer)p)).getHandle().ping/50)).contains(pos) && Artid.mcPlayers.get(p.getUniqueId().toString()).player!=player) {
+                    posit = getPosition(d+accuracy*10);
+                    for(int i=0; i<10; i++){
                         positions.add(getPosition(d+(accuracy*i)));
                     }
                     return positions;
@@ -71,8 +70,10 @@ public class rayTracer {
             }
             for(CVCBot bot : Artid.bots){
                 if(bot.getBoundingBox().d(new Vec3D(pos.getX(),pos.getY(),pos.getZ())) && bot!=player) {
-                    positions.add(getPosition(d+accuracy));
-                    positions.add(getPosition(d+(accuracy*2)));
+                    posit = getPosition(d+accuracy*10);
+                    for(int i=0; i<10; i++){
+                        positions.add(getPosition(d+(accuracy*i)));
+                    }
                     return positions;
                 }
             }
@@ -125,6 +126,9 @@ public class rayTracer {
                 case OAK_WOOD: case SPRUCE_WOOD: case STRIPPED_ACACIA_WOOD: case STRIPPED_BIRCH_WOOD: case STRIPPED_DARK_OAK_WOOD: case STRIPPED_JUNGLE_WOOD: case STRIPPED_OAK_WOOD:
                 case STRIPPED_SPRUCE_WOOD: case SPRUCE_SLAB: case BIRCH_SLAB: case DARK_OAK_SLAB: case ACACIA_SLAB: case JUNGLE_SLAB: case OAK_SLAB: case PETRIFIED_OAK_SLAB:
                 case SPRUCE_STAIRS: case OAK_STAIRS: case JUNGLE_STAIRS: case BIRCH_STAIRS: case ACACIA_STAIRS: case DARK_OAK_STAIRS: case CRIMSON_STAIRS: case WARPED_STAIRS:
+                case ACACIA_FENCE_GATE: case BIRCH_FENCE_GATE: case DARK_OAK_FENCE_GATE: case OAK_FENCE_GATE: case JUNGLE_FENCE_GATE: case SPRUCE_FENCE_GATE: case WARPED_FENCE_GATE:
+                case DARK_OAK_FENCE: case ACACIA_FENCE: case BIRCH_FENCE: case JUNGLE_FENCE: case SPRUCE_FENCE: case OAK_FENCE: case WARPED_FENCE: case DARK_OAK_DOOR: case ACACIA_DOOR:
+                case BIRCH_DOOR: case CRIMSON_DOOR: case IRON_DOOR: case JUNGLE_DOOR: case OAK_DOOR: case SPRUCE_DOOR: case WARPED_DOOR: 
                     if(hitBlocks!=null) {
                         if(block.getBoundingBox().contains(pos)) {
                             if (!hitEntity && !hitBlocks.contains(block)) {
@@ -286,6 +290,9 @@ public class rayTracer {
     }
     public boolean isThroughSmoke(){
         return throughSmoke;
+    }
+    public ArrayList<Block> getHitBlocks(){
+        return hitBlocks;
     }
 
 }

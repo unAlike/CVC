@@ -44,7 +44,13 @@ public class PlayerInteract implements Listener {
         if (e.getItem() != null) {
             if ((e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK))&&e.getHand().equals(EquipmentSlot.HAND)) {
                 //Starts runnables & canncels events
+                //Bukkit.broadcastMessage("rIGHT Clcik!");
                 switch (e.getItem().getType()) {
+                    default:
+                        if(e.getPlayer().getGameMode() != GameMode.CREATIVE) e.setCancelled(true);
+                        break;
+                    case GOLDEN_APPLE:
+                        break;
                     case GHAST_TEAR:
                         e.getPlayer().openInventory(shop.getInv());
                         break;
@@ -68,8 +74,34 @@ public class PlayerInteract implements Listener {
                             p.getMain().setTimeSinceClick(0);
                             e.setCancelled(true);
                         }
-
-
+                        break;
+                    case NETHERITE_SHOVEL:
+                        if(Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain()!=null) {
+                            if(!p.famasOnCooldown){
+                                p.famasOnCooldown = true;
+                                new BukkitRunnable(){
+                                    int i = 0;
+                                    @Override
+                                    public void run() {
+                                        if(i<3){
+                                            p.getMain().shootPing(p.player.getWorld(), p.player);
+                                            p.getMain().setCooldown(false);
+                                            i++;
+                                        }
+                                        else{
+                                            new BukkitRunnable(){
+                                                @Override
+                                                public void run() {
+                                                    p.getMain().setRecoil(0);
+                                                    p.famasOnCooldown = false;
+                                                }
+                                            }.runTaskLater(Artid.plug,2);
+                                            this.cancel();
+                                        }
+                                    }
+                                }.runTaskTimer(Artid.plug, 0, 2);
+                            }
+                        }
                         break;
                     case DIAMOND_SHOVEL:
                         e.setCancelled(true);
@@ -93,15 +125,25 @@ public class PlayerInteract implements Listener {
                     case STONE_PICKAXE:
                         if(Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getOffhand()!=null) {
                             e.setCancelled(true);
-                            if(!p.getOffhand().getCooldown()) {
+                            if(!p.hkOnCooldown) {
+                                p.hkOnCooldown = true;
+                                p.getOffhand().setCooldown(false);
                                 p.getOffhand().shootPing(e.getPlayer().getWorld(),e.getPlayer());
                                 new BukkitRunnable() {
                                     @Override
                                     public void run() {
                                         p.getOffhand().setCooldown(false);
                                         p.getOffhand().shootPing(e.getPlayer().getWorld(),e.getPlayer());
+                                        p.getOffhand().setCooldown(false);
                                     }
                                 }.runTaskLater(Artid.plug, 4);
+
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        p.hkOnCooldown = false;
+                                    }
+                                }.runTaskLater(Artid.plug, 12);
                             }
                         }
                         break;
@@ -139,8 +181,9 @@ public class PlayerInteract implements Listener {
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if ((e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) && e.getHand().equals(EquipmentSlot.HAND)) {
                             /////////////// HEAVY GUNS ///////////////////////
+                //Bukkit.broadcastMessage("Left Clcik!");
                 switch(e.getPlayer().getInventory().getItemInMainHand().getType()){
-                    case WOODEN_AXE: case IRON_AXE: case STONE_SHOVEL: case GOLDEN_SHOVEL: case NETHERITE_SWORD: case STONE_HOE: case GOLDEN_AXE: case DIAMOND_SHOVEL:
+                    case WOODEN_AXE: case IRON_AXE: case STONE_SHOVEL: case GOLDEN_SHOVEL: case NETHERITE_SWORD: case STONE_HOE: case GOLDEN_AXE: case DIAMOND_SHOVEL: case NETHERITE_SHOVEL:
                     Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString()).getMain().reload();
                     break;
                         /////////////////PISTOLS////////////////////////////

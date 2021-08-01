@@ -16,13 +16,20 @@ public class playerDeath implements Listener {
     @EventHandler
     public void death(PlayerDeathEvent e){
         mcgoPlayer mc = Artid.mcPlayers.get(e.getEntity().getPlayer().getUniqueId().toString());
+        mc.killStreak = 0;
+        mc.deaths++;
+        mc.lobbysb.update();
+        mc.gamesb.update();
+
         if(mc.getMain()!=null){
+            mc.getMain().unScope();
             mc.getMain().setAmmo(mc.getMain().getMaxAmmo());
             mc.getMain().getItem().setAmount(mc.getMain().getMaxAmmo());
             mc.getMain().setCooldown(false);
             mc.getMain().setIsReloading(false);
             mc.getMain().updateItem();
             mc.player.getInventory().setHelmet(new ItemStack(Material.AIR));
+            mc.famasOnCooldown=false;
             if(mc.getMain().getItem().getType().equals(Material.GOLDEN_AXE)){
                 mc.getMain().setFireRate(2);
                 mc.getMain().setMaxRecoil(8f);
@@ -31,7 +38,8 @@ public class playerDeath implements Listener {
             }
         }
         if(mc.getOffhand()!=null){
-            mc.getOffhand().setAmmo(mc.getOffhand().getAmmo());
+            mc.hkOnCooldown=false;
+            mc.getOffhand().setAmmo(mc.getOffhand().getMaxAmmo());
             mc.getOffhand().getItem().setAmount(mc.getOffhand().getMaxAmmo());
             mc.getOffhand().setCooldown(false);
             mc.getOffhand().setIsReloading(false);

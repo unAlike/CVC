@@ -1,9 +1,11 @@
 package events.player;
 
 import groupid.artid.Artid;
+import org.bukkit.Art;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -12,11 +14,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class playerEat implements Listener {
     @EventHandler
     public void eat(PlayerItemConsumeEvent e){
+        e.getPlayer().sendMessage("Hi");
         switch(e.getItem().getType()){
             default:
                 break;
             case GOLDEN_APPLE:
-                e.setCancelled(true);
+
                 if(!e.getPlayer().getLocation().subtract(0,1,0).getBlock().getType().equals(Material.AIR) && e.getPlayer().isOnGround()){
                     bombPlant(e);
                 }

@@ -1,6 +1,7 @@
 package groupid.artid;
 
 import bot.CVCBot;
+import game.game;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -12,6 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.Objects;
 
 public class commands implements CommandExecutor {
     @Override
@@ -27,18 +30,33 @@ public class commands implements CommandExecutor {
                     case "hub":
                         p.getInventory().clear();
                         p.teleport(new Location(Bukkit.getWorld("world"), 0.5, 63, 0.5));
+                        p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
                         break;
                     case "fix":
                         for(Player pla : p.getWorld().getPlayers()){
                             pla.setInvulnerable(false);
                         }
                         break;
-                    case "reset": case "r":
-                        break;
                     case "ping":
                         for(Player pla : p.getWorld().getPlayers()){
                             p.sendMessage(pla.getDisplayName() + "'s Ping is: " + ((CraftPlayer)pla).getHandle().ping);
                         }
+                        break;
+                    case "game":
+                        game g = new game(p.getWorld());
+                        Artid.games.put(g.gameId.toString(), g);
+                        Bukkit.broadcastMessage(Artid.games.toString());
+                        Artid.mcPlayers.get(p.getUniqueId().toString()).gameUUID=g.gameId;
+                        g.addPlayer(Objects.requireNonNull(((Player) sender).getPlayer()));
+                        break;
+                    case "lsb":
+                        p.setScoreboard(Artid.mcPlayers.get(p.getUniqueId().toString()).lobbysb.getScoreboard());
+                        break;
+                    case "gsb":
+                        p.setScoreboard(Artid.mcPlayers.get(p.getUniqueId().toString()).gamesb.getScoreboard());
+                        break;
+                    case "ready": case "r":
+                        Artid.mcPlayers.get(p.getUniqueId().toString()).ready = true;
                         break;
                     case "bot":
                         p.sendMessage("Spawning Bot");

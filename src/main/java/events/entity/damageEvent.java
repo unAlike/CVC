@@ -97,6 +97,8 @@ public class damageEvent implements Listener {
                 pack2[0] = new PacketPlayOutSpawnEntityLiving(arm);
                 ((CraftPlayer)p).getHandle().playerConnection.sendPacket(pack2[0]);
                 ((CraftPlayer)p).getHandle().playerConnection.sendPacket(pack[0]);
+                PacketPlayOutEntityDestroy kill = new PacketPlayOutEntityDestroy(arm.getId());
+                ((CraftPlayer)p).getHandle().playerConnection.sendPacket(kill);
 
             }
         }.runTaskLater(Artid.plug, 20);

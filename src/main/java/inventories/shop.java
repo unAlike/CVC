@@ -20,6 +20,7 @@ import java.util.ListIterator;
 public class shop {
     private final Inventory inv;
     public shop(){
+        //Setup Weapon Select
         this.inv = Bukkit.createInventory(null, 36, "Weapon Selector");
         inv.setItem(1, customItem(Material.WOODEN_PICKAXE, "USP", lore(2,3,7,5,2)));
         inv.setItem(2, customItem(Material.STONE_PICKAXE, "HK45", lore(2,3,7,4,3)));
@@ -30,6 +31,7 @@ public class shop {
         inv.setItem(7, customItem(Material.STONE_HOE, "AK47", lore(4,5,4,6,5)));
         inv.setItem(11, customItem(Material.IRON_AXE, "M4", lore(3,6,6,5,4)));
         inv.setItem(12, customItem(Material.GOLDEN_AXE, "AUG", lore(4,2,4,5,5)));
+        inv.setItem(13, customItem(Material.NETHERITE_SHOVEL, "FAMAS", lore(20,3,7,6,5)));
         inv.setItem(14, customItem(Material.DIAMOND_SHOVEL, "Pump Action", lore(6,1,6,1,1)));
         inv.setItem(15, customItem(Material.WOODEN_AXE, "SPAS-12", lore(5,2,6,2,1)));
 
@@ -41,6 +43,7 @@ public class shop {
         inv.setItem(22, customItem(Material.BONE, "Knife"));
 
     }
+    //Custom Item
     public static ItemStack customItem(Material m, String name, ArrayList<String> lore){
         ItemStack item = new ItemStack(m);
         ItemMeta meta = item.getItemMeta();

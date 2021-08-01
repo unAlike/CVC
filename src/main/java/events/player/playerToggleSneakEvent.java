@@ -24,7 +24,7 @@ public class playerToggleSneakEvent implements Listener {
         mcgoPlayer mcPlayer = Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString());
         switch (e.getPlayer().getInventory().getItemInMainHand().getType()){
             case NETHERITE_SWORD:
-                if (!e.getPlayer().isSneaking()) {
+                if (!e.getPlayer().isSneaking() && mcPlayer.getMain().getSnipeState()==0) {
                     isSneaking = true;
                     CraftPlayer player = (CraftPlayer) e.getPlayer();
 
@@ -34,24 +34,11 @@ public class playerToggleSneakEvent implements Listener {
                     if(player.getGameMode().equals(GameMode.CREATIVE)) FOV.getBooleans().write(2, true);
                     else FOV.getBooleans().write(2, false);
 
-                    switch (mcPlayer.getMain().getSnipeState()){
-                        case 0:
-                            player.setWalkSpeed(0.1f);
-                            FOV.getFloat().write(1, .15f);
-                            e.getPlayer().getInventory().setHelmet(new ItemStack(Material.CARVED_PUMPKIN));
-                            mcPlayer.getMain().setSnipeState(1);
-                            break;
-                        case 1:
-                            player.setWalkSpeed(0.05f);
-                            FOV.getFloat().write(1, 10f);
-                            mcPlayer.getMain().setSnipeState(2);
-                            break;
-                        case 2:
-                            player.setWalkSpeed(0.2f);
-                            FOV.getFloat().write(1, .1f);
-                            e.getPlayer().getInventory().setHelmet(new ItemStack(Material.AIR));
-                            mcPlayer.getMain().setSnipeState(0);
-                    }
+                    player.setWalkSpeed(0.1f);
+                    FOV.getFloat().write(1, .15f);
+                    e.getPlayer().getInventory().setHelmet(new ItemStack(Material.CARVED_PUMPKIN));
+                    mcPlayer.getMain().setSnipeState(1);
+
                     try {
                         Artid.protocolManager.sendServerPacket(player, FOV);
                     } catch (InvocationTargetException ex) {
@@ -61,6 +48,8 @@ public class playerToggleSneakEvent implements Listener {
                 }
                 else {
                     isSneaking = false;
+                    mcPlayer.getMain().setSnipeState(0);
+                    mcPlayer.getMain().unScope();
                 }
                 break;
             case GOLDEN_AXE:
@@ -68,7 +57,7 @@ public class playerToggleSneakEvent implements Listener {
                 PacketContainer FOV = new PacketContainer(PacketType.Play.Server.ABILITIES);
                 if (!e.getPlayer().isSneaking() && mcPlayer.getMain().getSnipeState()==0) {
                     mcPlayer.getMain().setSnipeState(1);
-                    mcPlayer.getMain().setFireRate(4);
+                    mcPlayer.getMain().setFireRate(3);
                     mcPlayer.getMain().setMaxRecoil(0f);
                     mcPlayer.getMain().setSpread(1);
                     mcPlayer.getMain().setSnipeState(1);
@@ -87,7 +76,7 @@ public class playerToggleSneakEvent implements Listener {
                     mcPlayer.getMain().setFireRate(2);
                     mcPlayer.getMain().setMaxRecoil(8f);
                     mcPlayer.getMain().setSpread(12);
-                    player.setWalkSpeed(0.2f);
+                    player.setWalkSpeed(0.17f);
                     mcPlayer.getMain().setSnipeState(0);
                     e.getPlayer().getInventory().setHelmet(new ItemStack(Material.AIR));
                     FOV.getFloat().write(1, .1f);

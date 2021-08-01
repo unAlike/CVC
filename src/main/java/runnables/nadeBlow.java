@@ -107,7 +107,16 @@ public class nadeBlow extends BukkitRunnable {
         ar.remove();
     }
     public static void decoy(ArmorStand ar, World w){
-        BukkitRunnable decoys = new decoyNoise(ar,"mcgo.weapons.carbineshot");
+        BukkitRunnable decoys;
+        if(Artid.mcPlayers.get(ar.getCustomName()).getMain()!=null){
+            decoys = new decoyNoise(ar,Artid.mcPlayers.get(ar.getCustomName()).getMain().getSoundEffect());
+        }
+        else if(Artid.mcPlayers.get(ar.getCustomName()).getOffhand()!=null){
+            decoys = new decoyNoise(ar,Artid.mcPlayers.get(ar.getCustomName()).getOffhand().getSoundEffect());
+        }
+        else {
+            decoys = new decoyNoise(ar, Artid.mcPlayers.get(ar.getCustomName()).getOffhand().getSoundEffect());
+        }
         decoys.runTaskTimer(Artid.plug, 3, 3);
         if(ar.getVehicle()!=null) ar.getVehicle().remove();
         ar.remove();

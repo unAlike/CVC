@@ -17,8 +17,9 @@ public class adventure extends BukkitRunnable {
         for(World w : Bukkit.getWorlds()) {
             for (Player p : w.getPlayers()) {
                 if(p.getGameMode()!=GameMode.CREATIVE) {
-                    p.setGameMode(GameMode.SURVIVAL);
+//                    p.setGameMode(GameMode.SURVIVAL);
                 }
+                //prevent Hunger
                 p.setSaturation(2000000000);
             }
         }

@@ -9,23 +9,13 @@ import events.entity.entityHit;
 import events.entity.damageEvent;
 import events.player.*;
 import events.inventory.InventoryClick;
-import guns.gunTypes;
+import game.game;
 import inventories.shop;
-import net.minecraft.server.v1_16_R3.EntityLiving;
-import net.minecraft.server.v1_16_R3.PacketPlayOutEntityDestroy;
-import net.minecraft.server.v1_16_R3.PacketPlayOutPlayerInfo;
-import net.minecraft.server.v1_16_R3.PlayerConnection;
 import org.bukkit.*;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
 import runnables.adventure;
 import runnables.nadeBlow;
 import scheduler.scheduler;
@@ -41,7 +31,7 @@ public final class Artid extends JavaPlugin implements Listener {
     public static HashMap<String, mcgoPlayer> mcPlayers;
     public static HashMap<String, String> isShooting;
     public static ArrayList<CVCBot> bots;
-    public static HashMap<String, World> worlds;
+    public static HashMap<String, game> games;
 
     @Override
     public void onEnable() {
@@ -64,6 +54,7 @@ public final class Artid extends JavaPlugin implements Listener {
                 p.setGameMode(GameMode.SURVIVAL);
             }
             if(!p.getWorld().equals("world")){
+                mcPlayers.get(p.getUniqueId().toString()).player.setScoreboard(mcPlayers.get(p.getUniqueId().toString()).lobbysb.getScoreboard());
                 p.getInventory().clear();
                 p.getInventory().setItem(8, shop.customItem(Material.GHAST_TEAR,ChatColor.WHITE + "Shop"));
                 p.getInventory().setItem(2, shop.customItem(Material.BONE,ChatColor.WHITE + "Knife"));
@@ -93,6 +84,7 @@ public final class Artid extends JavaPlugin implements Listener {
         ad.runTaskTimer(Artid.plug, 0, 3);
         nades.runTaskTimer(Artid.plug, 1,1);
         runner.runTaskTimer(Artid.plug, 10, 10);
+
         //Register Events
         getServer().getPluginManager().registerEvents(new PlayerInteract(), this);
         getServer().getPluginManager().registerEvents(new playerJoin(), this);
@@ -119,25 +111,18 @@ public final class Artid extends JavaPlugin implements Listener {
         getCommand("cvc").setTabCompleter(new commandsTabCompleter());
 
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "CVC MOD STARTED");
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for(CVCBot b : bots){
-                    b.setGlowing();
-                }
-            }
-        }.runTaskTimer(this,0,10);
+
     }
 
     @Override
     public void onDisable() {
+        for(Player p: Bukkit.getOnlinePlayers()){
+            mcPlayers.get(p.getUniqueId().toString()).gamesb.getScoreboard().getObjectives().clear();
+        }
+        mcPlayers.clear();
         for(CVCBot bot : bots){
            bot.destroy();
         }
     }
-
-
-
-
 
 }
