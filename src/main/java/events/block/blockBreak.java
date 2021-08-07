@@ -10,10 +10,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class blockBreak implements Listener {
     @EventHandler
     public void blockBreak(BlockBreakEvent e){
-        if(e.getPlayer().getGameMode().equals(GameMode.CREATIVE)){
-
-        }
-        else {
+        if(!e.getPlayer().getGameMode().equals(GameMode.CREATIVE)){
             e.setCancelled(true);
         }
     }

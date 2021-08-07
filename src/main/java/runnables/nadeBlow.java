@@ -1,6 +1,8 @@
 package runnables;
 
 import groupid.artid.Artid;
+import guns.gun;
+import guns.gunTypes;
 import org.apache.commons.lang.Validate;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -15,6 +17,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class nadeBlow extends BukkitRunnable {
     @Override
@@ -68,7 +71,7 @@ public class nadeBlow extends BukkitRunnable {
                     }
                     else{
                         ((CraftPlayer) e).damage(20);
-                        Bukkit.broadcastMessage(ChatColor.AQUA + ar.getName() + ChatColor.WHITE + " 銃 " + ChatColor.GREEN + ((CraftPlayer) e).getDisplayName());
+                        Bukkit.broadcastMessage(ChatColor.DARK_AQUA + ar.getName() + ChatColor.WHITE + " 銃 " + ChatColor.GREEN + ((CraftPlayer) e).getDisplayName());
                     }
                 }
             }
@@ -108,16 +111,22 @@ public class nadeBlow extends BukkitRunnable {
     }
     public static void decoy(ArmorStand ar, World w){
         BukkitRunnable decoys;
-        if(Artid.mcPlayers.get(ar.getCustomName()).getMain()!=null){
-            decoys = new decoyNoise(ar,Artid.mcPlayers.get(ar.getCustomName()).getMain().getSoundEffect());
+        decoys = new decoyNoise(ar,gunTypes.USP.getGun().getSoundEffect());
+        if(!Objects.isNull(Artid.mcPlayers.get(Bukkit.getPlayer(ar.getCustomName()).getUniqueId().toString()).getMain())){
+            decoys = new decoyNoise(ar,Artid.mcPlayers.get(Bukkit.getPlayer(ar.getCustomName()).getUniqueId().toString()).getMain().getSoundEffect());
+            decoys.runTaskTimer(Artid.plug, 3, (long)Artid.mcPlayers.get(Bukkit.getPlayer(ar.getCustomName()).getUniqueId().toString()).getMain().getFireRate());
+            if(ar.getVehicle()!=null) ar.getVehicle().remove();
+            ar.remove();
+            return;
         }
-        else if(Artid.mcPlayers.get(ar.getCustomName()).getOffhand()!=null){
-            decoys = new decoyNoise(ar,Artid.mcPlayers.get(ar.getCustomName()).getOffhand().getSoundEffect());
+        else if(!Objects.isNull(Artid.mcPlayers.get(Bukkit.getPlayer(ar.getCustomName()).getUniqueId().toString()).getOffhand())){
+            decoys = new decoyNoise(ar,Artid.mcPlayers.get(Bukkit.getPlayer(ar.getCustomName()).getUniqueId().toString()).getOffhand().getSoundEffect());
+            decoys.runTaskTimer(Artid.plug, 3, (long)Artid.mcPlayers.get(Bukkit.getPlayer(ar.getCustomName()).getUniqueId().toString()).getOffhand().getFireRate());
+            if(ar.getVehicle()!=null) ar.getVehicle().remove();
+            ar.remove();
+            return;
         }
-        else {
-            decoys = new decoyNoise(ar, Artid.mcPlayers.get(ar.getCustomName()).getOffhand().getSoundEffect());
-        }
-        decoys.runTaskTimer(Artid.plug, 3, 3);
+        decoys.runTaskTimer(Artid.plug, 3, (long)gunTypes.USP.getGun().getFireRate());
         if(ar.getVehicle()!=null) ar.getVehicle().remove();
         ar.remove();
     }

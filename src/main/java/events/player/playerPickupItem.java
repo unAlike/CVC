@@ -14,6 +14,13 @@ public class playerPickupItem implements Listener {
     @EventHandler
     public void pickupItem(PlayerPickupItemEvent e) throws CloneNotSupportedException {
         mcgoPlayer mc = Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString());
+        if(e.getItem().getItemStack().getType()==Material.QUARTZ){
+            e.setCancelled(true);
+            e.getItem().remove();
+            e.getPlayer().getInventory().setItem(6,new ItemStack(Material.QUARTZ));
+            Artid.games.get(mc.gameUUID).playerWithBomb = mc;
+            mc.player.playSound(mc.player.getLocation(),"mcgo.gamesounds.pickedupthebomb",1,1);
+        }
         if(e.getPlayer().getInventory().getItem(0)!=null){
             e.setCancelled(true);
         }

@@ -2,12 +2,13 @@ package groupid.artid;
 
 import com.mojang.datafixers.util.Pair;
 import guns.gun;
+import inventories.gameShop;
 import mcgoScoreboard.mcgoScoreboard;
 import mcgoScoreboard.lobbyScoreboard;
 import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.EnumItemSlot;
 import net.minecraft.server.v1_16_R3.PacketPlayOutEntityEquipment;
-import org.bukkit.Bukkit;
+import org.bukkit.Art;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -21,19 +22,22 @@ public class mcgoPlayer {
     public String UUID;
     public Player player;
     public int mcVersion;
-    public java.util.UUID gameUUID;
+    public String gameUUID;
 
     LinkedList<BoundingBox> boxs = new LinkedList<BoundingBox>();
     LinkedList<Location> locs = new LinkedList<Location>();
 
     public gun main;
     public gun offhand;
+    public gameShop gameShop;
     public boolean blind = false;
     public boolean onFire;
     public boolean hypixelNades = false;
     public boolean famasOnCooldown = false;
     public boolean hkOnCooldown = false;
     public boolean ready;
+    public boolean headArmor;
+    public boolean bodyArmor;
     public int kills;
     public int killStreak;
     public int deaths;
@@ -47,7 +51,7 @@ public class mcgoPlayer {
 
 
     public mcgoPlayer(Player p){
-        this.gameUUID= null;
+        this.gameUUID= "";
         this.name = p.getName();
         this.UUID = p.getUniqueId().toString();
         this.player = p;
@@ -60,9 +64,12 @@ public class mcgoPlayer {
         this.deaths=0;
         this.assists=0;
         this.ready = false;
+        this.headArmor=false;
+        this.bodyArmor=false;
 
         this.gamesb = new mcgoScoreboard(this);
         this.lobbysb = new lobbyScoreboard(this);
+        this.gameShop = new gameShop(this);
 
 
         new BukkitRunnable(){
@@ -122,6 +129,9 @@ public class mcgoPlayer {
     public gun getOffhand(){
         return offhand;
     }
+    public void updateGameShop(){
+        this.gameShop.update();
+    }
     public void giveMainGun(){
         player.getInventory().setItem(0, main.getItem());
         main.updateItem(0);
@@ -129,7 +139,7 @@ public class mcgoPlayer {
     public void giveOffhandGun(){player.getInventory().setItem(1, offhand.getItem());
         offhand.updateItem();
     }
-    public BoundingBox getBox(int ticks){
+    public BoundingBox getBox(int ticks) throws IndexOutOfBoundsException{
         return boxs.get(ticks);
     }
     public Location getLoc(int ticks){
@@ -138,8 +148,27 @@ public class mcgoPlayer {
     public void clearBoxs(){
         boxs.clear();
     }
-    public void setGameUUID(UUID id){
+    public void setGameUUID(String id){
         this.gameUUID = id;
+    }
+    public boolean hasGameId(){
+        if(gameUUID.length()>2){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    public ArrayList getTeam(){
+        if(hasGameId()){
+            if(Artid.games.get(gameUUID).copPlayers.contains(this)){
+                return Artid.games.get(gameUUID).copPlayers;
+            }
+            if(Artid.games.get(gameUUID).crimPlayers.contains(this)){
+                return Artid.games.get(gameUUID).crimPlayers;
+            }
+        }
+        return null;
     }
 
     public int getMoney() {

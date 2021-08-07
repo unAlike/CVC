@@ -72,7 +72,7 @@ public class playerToggleSneakEvent implements Listener {
                                 "Cannot send packet " + FOV, ex);
                     }
                 }
-                if(e.getPlayer().isSneaking() && mcPlayer.getMain().getSnipeState()==1){
+                else{
                     mcPlayer.getMain().setFireRate(2);
                     mcPlayer.getMain().setMaxRecoil(8f);
                     mcPlayer.getMain().setSpread(12);

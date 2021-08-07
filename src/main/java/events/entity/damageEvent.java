@@ -3,7 +3,9 @@ package events.entity;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
+import game.game;
 import groupid.artid.Artid;
+import groupid.artid.mcgoPlayer;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -54,15 +56,36 @@ public class damageEvent implements Listener {
                 break;
             case ENTITY_ATTACK:
                 if(e instanceof EntityDamageByEntityEvent) {
+                    mcgoPlayer p = Artid.mcPlayers.get(e.getEntity().getUniqueId().toString());
+                    mcgoPlayer dmgr = Artid.mcPlayers.get(((EntityDamageByEntityEvent) e).getDamager().getUniqueId().toString());
+                    game g = Artid.games.get(p.gameUUID);
+
                     if (e.getEntity() instanceof Player && ((EntityDamageByEntityEvent) e).getDamager() instanceof Player && ((Player) ((EntityDamageByEntityEvent) e).getDamager()).getInventory().getItemInMainHand().getType().equals(Material.BONE)){
-                        if(((Player) e.getEntity()).getHealth()-4 >= 0) {
-                            ((Player) e.getEntity()).setHealth(((Player) e.getEntity()).getHealth() - 4);
+                        if(p.hasGameId() && !p.getTeam().contains(dmgr)){
+                            if (((Player) e.getEntity()).getHealth() - 4 >= 0) {
+                                ((Player) e.getEntity()).setHealth(((Player) e.getEntity()).getHealth() - 4);
+                            }
+                            else{
+                                Artid.mcPlayers.get(((EntityDamageByEntityEvent) e).getDamager().getUniqueId().toString()).kills++;
+                                Artid.mcPlayers.get(((EntityDamageByEntityEvent) e).getDamager().getUniqueId().toString()).killStreak++;
+                                dmgr.money+=1500;
+                                ((Player) e.getEntity()).damage((double)20);
+                                Bukkit.broadcastMessage(ChatColor.DARK_AQUA + ((Player) ((EntityDamageByEntityEvent) e).getDamager()).getDisplayName() + ChatColor.WHITE + " 銌 " + ChatColor.GREEN + ((Player) e.getEntity()).getDisplayName());
+                            }
                         }
-                        else {
-                            ((Player) e.getEntity()).damage((double)20);
-                            Bukkit.broadcastMessage(ChatColor.AQUA + ((Player) ((EntityDamageByEntityEvent) e).getDamager()).getDisplayName() + ChatColor.WHITE + " 銌 " + ChatColor.GREEN + ((Player) e.getEntity()).getDisplayName());
+                        if(p.hasGameId() && Artid.games.get(p.gameUUID).preGame){
+                            if (((Player) e.getEntity()).getHealth() - 4 >= 0) {
+                                ((Player) e.getEntity()).setHealth(((Player) e.getEntity()).getHealth() - 4);
+                            }
+                            else{
+                                Artid.mcPlayers.get(((EntityDamageByEntityEvent) e).getDamager().getUniqueId().toString()).kills++;
+                                Artid.mcPlayers.get(((EntityDamageByEntityEvent) e).getDamager().getUniqueId().toString()).killStreak++;
+                                dmgr.money+=1500;
+                                ((Player) e.getEntity()).damage((double)20);
+                                Bukkit.broadcastMessage(ChatColor.DARK_AQUA + ((Player) ((EntityDamageByEntityEvent) e).getDamager()).getDisplayName() + ChatColor.WHITE + " 銌 " + ChatColor.GREEN + ((Player) e.getEntity()).getDisplayName());
+                            }
                         }
-                        damageMarker(e.getEntity().getLocation(), ((CraftWorld)(e.getEntity().getWorld())).getHandle(), ((Player) ((EntityDamageByEntityEvent) e).getDamager()).getPlayer(), 4*5);
+                        damageMarker(e.getEntity().getLocation(), ((CraftWorld)(e.getEntity().getWorld())).getHandle(), ((Player) ((EntityDamageByEntityEvent) e).getDamager()).getPlayer(), 5*5);
                     }
                     else e.setCancelled(true);
                 }

@@ -3,15 +3,15 @@ package events.player;
 import com.mojang.datafixers.util.Pair;
 import groupid.artid.Artid;
 import groupid.artid.mcgoPlayer;
+import inventories.bigBomb;
+import inventories.gameShop;
 import inventories.shop;
+import inventories.smallBomb;
 import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.EntitySnowball;
 import net.minecraft.server.v1_16_R3.EnumItemSlot;
 import net.minecraft.server.v1_16_R3.PacketPlayOutEntityEquipment;
-import org.bukkit.Art;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
@@ -40,23 +40,77 @@ public class PlayerInteract implements Listener {
     @EventHandler
     public void rightClick(PlayerInteractEvent e){
         shop shop = new shop();
+        gameShop gameShop = new gameShop();
+        bigBomb bigBomb = new bigBomb();
+        smallBomb smallBomb = new smallBomb();
         mcgoPlayer p = Artid.mcPlayers.get(e.getPlayer().getUniqueId().toString());
+
+
         if (e.getItem() != null) {
             if ((e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK))&&e.getHand().equals(EquipmentSlot.HAND)) {
-                //Starts runnables & canncels events
-                //Bukkit.broadcastMessage("rIGHT Clcik!");
+
                 switch (e.getItem().getType()) {
                     default:
                         if(e.getPlayer().getGameMode() != GameMode.CREATIVE) e.setCancelled(true);
                         break;
                     case GOLDEN_APPLE:
                         break;
+                    case GOLD_NUGGET:
+                        if(p.hasGameId()){
+                            if(e.getClickedBlock()!=null) {
+                                if (e.getClickedBlock().getType() == Material.CHEST) {
+                                    p.player.openInventory(bigBomb.getInv());
+                                }
+                            }
+                        }
+                        break;
+                    case SHEARS:
+                        if(p.hasGameId()){
+                            if(e.getClickedBlock()!=null) {
+                                if (e.getClickedBlock() == Artid.games.get(p.gameUUID).bombLocation) {
+                                    p.player.openInventory(smallBomb.getInv());
+                                }
+                            }
+                        }
+                        break;
+                    case GRAY_DYE:
+                        if(p.hasGameId()){
+                            p.ready = true;
+                            p.player.getInventory().setItem(7,new ItemStack(Material.LIME_DYE));
+                        }
+                        break;
+                    case LIME_DYE:
+                        if(p.hasGameId()){
+                            p.ready = false;
+                            p.player.getInventory().setItem(7,new ItemStack(Material.GRAY_DYE));
+                        }
+                        break;
                     case GHAST_TEAR:
-                        e.getPlayer().openInventory(shop.getInv());
+                        if(p.hasGameId()) {
+                            if(Artid.games.get(p.gameUUID).copPlayers.contains(p)){
+                                if(!Artid.games.get(p.gameUUID).preGame && Artid.games.get(p.gameUUID).getSpawnLocations(p.player.getWorld().getName()).getCopSpawn().contains(p.player.getBoundingBox()) && Artid.games.get(p.gameUUID).canBuyWeapon) {
+                                    e.getPlayer().openInventory(p.gameShop.getInv());
+                                    p.player.playSound(p.player.getLocation(),"mcgo.shop.shopmenuopen",1,1);
+                                }else p.player.sendMessage(ChatColor.RED + "You must be in your team's spawn to buy.");
+                            }
+                            else {
+                                e.getPlayer().openInventory(shop.getInv());
+                                p.player.playSound(p.player.getLocation(),"mcgo.shop.shopmenuopen",1,1);
+                            }
+                        }
+                        else{
+                            e.getPlayer().openInventory(shop.getInv());
+                            p.player.playSound(p.player.getLocation(),"mcgo.shop.shopmenuopen",1,1);
+                        }
                         break;
                     case COMPASS:
-                        e.getPlayer().setBedSpawnLocation(e.getPlayer().getLocation(), true);
-                        e.getPlayer().sendMessage("Spawn has been set.");
+                        if(e.getItem().getItemMeta().getDisplayName()=="Set Spawn") {
+                            e.getPlayer().setBedSpawnLocation(e.getPlayer().getLocation(), false);
+                            e.getPlayer().sendMessage("Spawn has been set.");
+                        }
+                        else{
+                            e.getPlayer().sendMessage("Follow the compass to find the bomb!");
+                        }
                         break;
                         //########################## HEAVY GUNS #######################################################
                     case NETHERITE_SWORD:

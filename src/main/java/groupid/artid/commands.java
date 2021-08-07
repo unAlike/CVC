@@ -2,6 +2,7 @@ package groupid.artid;
 
 import bot.CVCBot;
 import game.game;
+import org.bukkit.Art;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -15,6 +16,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class commands implements CommandExecutor {
     @Override
@@ -29,6 +31,9 @@ public class commands implements CommandExecutor {
                         break;
                     case "hub":
                         p.getInventory().clear();
+                        Artid.games.get(Artid.mcPlayers.get(p.getUniqueId().toString()).gameUUID).removePlayer(Artid.mcPlayers.get(p.getUniqueId().toString()));
+                        Artid.mcPlayers.get(p.getUniqueId().toString()).gameUUID="";
+                        Artid.mcPlayers.get(p.getUniqueId().toString()).ready=false;
                         p.teleport(new Location(Bukkit.getWorld("world"), 0.5, 63, 0.5));
                         p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
                         break;
@@ -41,13 +46,6 @@ public class commands implements CommandExecutor {
                         for(Player pla : p.getWorld().getPlayers()){
                             p.sendMessage(pla.getDisplayName() + "'s Ping is: " + ((CraftPlayer)pla).getHandle().ping);
                         }
-                        break;
-                    case "game":
-                        game g = new game(p.getWorld());
-                        Artid.games.put(g.gameId.toString(), g);
-                        Bukkit.broadcastMessage(Artid.games.toString());
-                        Artid.mcPlayers.get(p.getUniqueId().toString()).gameUUID=g.gameId;
-                        g.addPlayer(Objects.requireNonNull(((Player) sender).getPlayer()));
                         break;
                     case "lsb":
                         p.setScoreboard(Artid.mcPlayers.get(p.getUniqueId().toString()).lobbysb.getScoreboard());
@@ -66,17 +64,22 @@ public class commands implements CommandExecutor {
                         mc.player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 100000, 10000000));
                         Artid.mcPlayers.put(bot.getUniqueID().toString(),mc);
                         break;
+                    case "games":
+                        Artid.games.forEach((g,f)->{
+                            Bukkit.broadcastMessage(f.map.getName() + f.gameId);
+                        });
+                        break;
+                    case "debug":
+                        for(mcgoPlayer mcp: Artid.mcPlayers.values()){
+                            Bukkit.broadcastMessage(mcp.player.getScoreboard().toString());
+                        }
+                        //p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
                     case "botglowing":
 
                         break;
                     case "delbot":
                         for(CVCBot cbot : Artid.bots){
                             cbot.destroy();
-                        }
-                        break;
-                    case "dmgbot":
-                        for(CVCBot cbot : Artid.bots){
-                            cbot.attack();
                         }
                         break;
                 }

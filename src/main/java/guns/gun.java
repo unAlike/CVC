@@ -27,9 +27,13 @@ public class gun implements Cloneable {
     int recoilCount = 0;
     int snipeState=0;
     int slot=0;
+    int moneyPerKill;
 
     float reloadTime;
-    float damage;
+    float damageBody;
+    float damageBodyArmor;
+    float damageHead;
+    float damageHeadArmor;
     float maxRecoil;
     float spread;
     float recoil;
@@ -55,10 +59,13 @@ public class gun implements Cloneable {
         return g;
     }
 
-    public gun(int fireRate, float reloadTime, float damage, int maxAmmo, int ammo, ItemStack item, float maxRecoil, float spread, String soundEffect, String name, String gunImg, int slot, float fallOffAmount){
+    public gun(int fireRate, float reloadTime, float damagebody, float damageBodyArmor, float damageHead, float damageHeadArmor, int maxAmmo, int ammo, ItemStack item, float maxRecoil, float spread, String soundEffect, String name, String gunImg, int slot, float fallOffAmount, int moneyPerKill){
         this.fireRate = fireRate;
         this.reloadTime = reloadTime;
-        this.damage = damage;
+        this.damageBody = damagebody;
+        this.damageBodyArmor = damageBodyArmor;
+        this.damageHead = damageHead;
+        this.damageHeadArmor = damageHeadArmor;
         this.maxAmmo = maxAmmo;
         this.ammo = ammo;
         this.item = item;
@@ -69,48 +76,10 @@ public class gun implements Cloneable {
         this.gunImg = gunImg;
         this.slot=slot;
         this.fallOffAmount = fallOffAmount;
+        this.moneyPerKill= moneyPerKill;
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(ChatColor.WHITE + name);
         item.setItemMeta(meta);
-    }
-    public gun(int fireRate, float reloadTime, float damage, int maxAmmo, int ammo, ItemStack item, float maxRecoil, float spread, String soundEffect, String name, String gunImg, Player p, int slot, float fallOffAmount){
-        this.fireRate = fireRate;
-        this.reloadTime = reloadTime;
-        this.damage = damage;
-        this.maxAmmo = maxAmmo;
-        this.ammo = ammo;
-        this.item = item;
-        this.maxRecoil = maxRecoil;
-        this.spread = spread;
-        this.soundEffect = soundEffect;
-        this.name = name;
-        this.gunImg = gunImg;
-        this.playerUUID = p.getUniqueId();
-        this.slot=slot;
-        this.fallOffAmount = fallOffAmount;
-        this.playerUUID = java.util.UUID.randomUUID();
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatColor.WHITE + name);
-        item.setItemMeta(meta);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                timeSinceClick++;
-                recoilCount--;
-                if(recoilCount<=0)recoil=0;
-            }
-        }.runTaskTimer(Artid.plug, 0,1);
-        new BukkitRunnable(){
-            final Player p = Bukkit.getPlayer(playerUUID);
-            final World w = Bukkit.getPlayer(playerUUID).getWorld();
-            @Override
-            public void run() {
-                if(Bukkit.getPlayer(playerUUID).getInventory().getItemInMainHand().equals(item) && timeSinceClick<5) {
-                    shootPing(w,p);
-                }
-            }
-        }.runTaskTimer(Artid.plug, 0, fireRate);
     }
     public void reload(){
         if(!isReloading && ammo!=maxAmmo) {
@@ -232,10 +201,10 @@ public class gun implements Cloneable {
                                         loc.setPitch(loc.getPitch() + (float) rand);
                                         break;
                                     case GOLDEN_AXE:
-//                                        rand = (rando.nextFloat() - .5) * (spread);
-//                                        loc.setYaw(loc.getYaw() + (float) rand);
-//                                        rand = (rando.nextFloat() - .5) * (spread);
-//                                        loc.setPitch((float) (loc.getPitch() - recoil + rand));
+                                        rand = (rando.nextFloat() - .5) * (spread);
+                                        loc.setYaw(loc.getYaw() + (float) rand);
+                                        rand = (rando.nextFloat() - .5) * (spread);
+                                        loc.setPitch((float) (loc.getPitch() - recoil + rand));
                                         p.getLocation().setPitch(p.getLocation().getPitch()+1);
                                         break;
                                 }
@@ -255,7 +224,16 @@ public class gun implements Cloneable {
                                     for (Map.Entry<String, mcgoPlayer> entry : Artid.mcPlayers.entrySet() ) {
                                         mcgoPlayer mc = entry.getValue();
                                         Player ent = mc.player;
-
+                                        if(Artid.mcPlayers.get(p.getUniqueId().toString()).hasGameId() && mc.hasGameId() && Artid.mcPlayers.get(p.getUniqueId().toString()) != mc){
+                                            if(Artid.games.get(Artid.mcPlayers.get(p.getUniqueId().toString()).gameUUID).copPlayers.contains(Artid.mcPlayers.get(p.getUniqueId().toString())) &&
+                                                    Artid.games.get(Artid.mcPlayers.get(p.getUniqueId().toString()).gameUUID).copPlayers.contains(mc)){
+                                                return;
+                                            }
+                                            if(Artid.games.get(Artid.mcPlayers.get(p.getUniqueId().toString()).gameUUID).crimPlayers.contains(Artid.mcPlayers.get(p.getUniqueId().toString())) &&
+                                                    Artid.games.get(Artid.mcPlayers.get(p.getUniqueId().toString()).gameUUID).crimPlayers.contains(mc)){
+                                                return;
+                                            }
+                                        }
 
                                         if (!ent.isDead()) {
                                             int ping = (((CraftPlayer) Bukkit.getPlayer(playerUUID)).getHandle().ping);
@@ -271,24 +249,50 @@ public class gun implements Cloneable {
                                                     if (head.contains(ray.getPos()) || ray.intersects(head, 100, .05, w, p)) {
                                                             if(ray.getWalls()>0 && ray.getHitBlocks().get(0).getLocation().distance(p.getLocation()) > ent.getLocation().distance(p.getLocation())){
                                                                 if(ent.getDisplayName().equals("Bot")){
-                                                                    p.sendMessage(ChatColor.RED + "" + ((((damage) * 2 * (Math.pow(.5, ray.getWalls()))) - fallOff))+ " Damage"+ ". Walls: "+ ray.getWalls() + ChatColor.GOLD);
-                                                                    damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,(float)(((damage) * 2 *(Math.pow(.5,ray.getWalls())))-fallOff));
-                                                                    ((LivingEntity) ent).damage(0.00001);
+                                                                    if(mc.headArmor) {
+                                                                        p.sendMessage(ChatColor.RED + "" + ((((damageHeadArmor) * (Math.pow(.5, ray.getWalls()))) - fallOff))+ " Damage"+ ". Walls: "+ ray.getWalls() + ChatColor.GOLD);
+                                                                        damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,(float)(((damageHeadArmor) *(Math.pow(.5,ray.getWalls())))-fallOff));
+                                                                        ((LivingEntity) ent).damage(0.00001);
+                                                                    }else{
+                                                                        p.sendMessage(ChatColor.RED + "" + ((((damageHead) * (Math.pow(.5, ray.getWalls()))) - fallOff))+ " Damage"+ ". Walls: "+ ray.getWalls() + ChatColor.GOLD);
+                                                                        damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,(float)(((damageHead) *(Math.pow(.5,ray.getWalls())))-fallOff));
+                                                                        ((LivingEntity) ent).damage(0.00001);
+                                                                    }
+
                                                                 }
                                                                 else {
-                                                                    ((LivingEntity) ent).damage(((((damage) * 2 * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5));
-                                                                    damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damage) * 2 * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                    if(mc.headArmor) {
+                                                                        ((LivingEntity) ent).damage(((((damageHeadArmor) * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5));
+                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageHeadArmor) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                    }
+                                                                    else {
+                                                                        ((LivingEntity) ent).damage(((((damageHead) * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5));
+                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageHead) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                    }
                                                                 }
                                                             }
                                                             else {
                                                                 if(ent.getDisplayName().equals("Bot")) {
-                                                                    p.sendMessage(ChatColor.RED + "" + (((damage) * 2) - fallOff) + " Damage");
-                                                                    damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,((float) (((damage) * 2)-fallOff)));
-                                                                    ((LivingEntity) ent).damage(0.00001);
+                                                                    if(mc.headArmor) {
+                                                                        p.sendMessage(ChatColor.RED + "" + (((damageHeadArmor)) - fallOff) + " Damage");
+                                                                        damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,((float) (((damageHeadArmor))-fallOff)));
+                                                                        ((LivingEntity) ent).damage(0.00001);
+                                                                    }
+                                                                    else{
+                                                                        p.sendMessage(ChatColor.RED + "" + (((damageHead)) - fallOff) + " Damage");
+                                                                        damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,((float) (((damageHead))-fallOff)));
+                                                                        ((LivingEntity) ent).damage(0.00001);
+                                                                    }
                                                                 }
                                                                 else {
-                                                                    ((LivingEntity) ent).damage((((damage) * 2) - fallOff) / 5);
-                                                                    damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (((damage) * 2) - fallOff)));
+                                                                    if(mc.headArmor) {
+                                                                        ((LivingEntity) ent).damage((((damageHeadArmor)) - fallOff) / 5);
+                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (((damageHeadArmor)) - fallOff)));
+                                                                    }
+                                                                    else{
+                                                                        ((LivingEntity) ent).damage((((damageHead)) - fallOff) / 5);
+                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (((damageHead)) - fallOff)));
+                                                                    }
                                                                 }
                                                             };
                                                             ent.setNoDamageTicks(0);
@@ -298,24 +302,50 @@ public class gun implements Cloneable {
                                                     } else {
                                                         if(ray.getWalls()>0 && ray.getHitBlocks().get(0).getLocation().distance(p.getLocation()) > ent.getLocation().distance(p.getLocation())){
                                                             if(ent.getDisplayName().equals("Bot")) {
-                                                                p.sendMessage(ChatColor.RED + "" + (((damage) * (Math.pow(.5, ray.getWalls()))) - fallOff)+ " Damage. Walls: "+ ray.getWalls() + ChatColor.GOLD);
-                                                                damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,(float) (((damage) *(Math.pow(.5,ray.getWalls())))-fallOff));
-                                                                ((LivingEntity) ent).damage(0.00001);
+                                                                if(mc.bodyArmor) {
+                                                                    p.sendMessage(ChatColor.RED + "" + (((damageBodyArmor) * (Math.pow(.5, ray.getWalls()))) - fallOff) + " Damage. Walls: " + ray.getWalls() + ChatColor.GOLD);
+                                                                    damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageBodyArmor) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                    ((LivingEntity) ent).damage(0.00001);
+                                                                }
+                                                                else {
+                                                                    p.sendMessage(ChatColor.RED + "" + (((damageBody) * (Math.pow(.5, ray.getWalls()))) - fallOff) + " Damage. Walls: " + ray.getWalls() + ChatColor.GOLD);
+                                                                    damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageBody) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                    ((LivingEntity) ent).damage(0.00001);
+                                                                }
                                                             }
                                                             else {
-                                                                ((LivingEntity) ent).damage((((damage) * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5);
-                                                                damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damage) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                if(mc.bodyArmor) {
+                                                                    ((LivingEntity) ent).damage((((damageBodyArmor) * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5);
+                                                                    damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageBodyArmor) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                }
+                                                                else {
+                                                                    ((LivingEntity) ent).damage((((damageBody) * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5);
+                                                                    damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageBody) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                }
                                                             }
                                                         }
                                                         else {
                                                             if(ent.getDisplayName().equals("Bot")) {
-                                                                p.sendMessage(ChatColor.RED + "" + (((damage)) - fallOff)+ " Damage");
-                                                                damageEvent.damageMarker(ent.getLocation(),((CraftWorld)w).getHandle(),p,((float) (damage-fallOff)));
-                                                                ((LivingEntity) ent).damage(0.00001);
+                                                                if(mc.bodyArmor) {
+                                                                    p.sendMessage(ChatColor.RED + "" + (((damageBodyArmor)) - fallOff) + " Damage");
+                                                                    damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damageBodyArmor - fallOff)));
+                                                                    ((LivingEntity) ent).damage(0.00001);
+                                                                }
+                                                                else {
+                                                                    p.sendMessage(ChatColor.RED + "" + (((damageBody)) - fallOff) + " Damage");
+                                                                    damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damageBody - fallOff)));
+                                                                    ((LivingEntity) ent).damage(0.00001);
+                                                                }
                                                             }
                                                             else {
-                                                                ((LivingEntity) ent).damage((((damage)) - fallOff) / 5);
-                                                                damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damage - fallOff)));
+                                                                if(mc.bodyArmor) {
+                                                                    ((LivingEntity) ent).damage((((damageBodyArmor)) - fallOff) / 5);
+                                                                    damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damageBodyArmor - fallOff)));
+                                                                }
+                                                                else {
+                                                                    ((LivingEntity) ent).damage((((damageBody)) - fallOff) / 5);
+                                                                    damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damageBody - fallOff)));
+                                                                }
                                                             }
                                                         }
                                                             ent.setNoDamageTicks(0);
@@ -335,9 +365,10 @@ public class gun implements Cloneable {
                                                         mcgoPlayer killer = Artid.mcPlayers.get(p.getUniqueId().toString());
                                                         killer.kills++;
                                                         killer.killStreak++;
+                                                        killer.money+=moneyPerKill;
                                                         killer.lobbysb.update();
                                                         killer.gamesb.update();
-                                                        String deathMsg = ChatColor.AQUA + p.getDisplayName() +" ";
+                                                        String deathMsg = ChatColor.DARK_AQUA + p.getDisplayName() +" ";
                                                         if(mc.blind) deathMsg = deathMsg.concat(ChatColor.WHITE +"鈃");
                                                         if((gunImg.equals("銄銅") || gunImg.equals("銘銙")) && snipeState == 0) deathMsg = deathMsg.concat(ChatColor.WHITE + "鈄");
                                                         deathMsg = deathMsg.concat(ChatColor.WHITE + gunImg);
@@ -444,6 +475,16 @@ public class gun implements Cloneable {
                                                 mcgoPlayer mc = entry.getValue();
                                                 Player ent = mc.player;
 
+                                                if(Artid.mcPlayers.get(p.getUniqueId().toString()).hasGameId() && mc.hasGameId() && Artid.mcPlayers.get(p.getUniqueId().toString()) != mc){
+                                                    if(Artid.games.get(Artid.mcPlayers.get(p.getUniqueId().toString()).gameUUID).copPlayers.contains(Artid.mcPlayers.get(p.getUniqueId().toString())) &&
+                                                            Artid.games.get(Artid.mcPlayers.get(p.getUniqueId().toString()).gameUUID).copPlayers.contains(mc)){
+                                                        return;
+                                                    }
+                                                    if(Artid.games.get(Artid.mcPlayers.get(p.getUniqueId().toString()).gameUUID).crimPlayers.contains(Artid.mcPlayers.get(p.getUniqueId().toString())) &&
+                                                            Artid.games.get(Artid.mcPlayers.get(p.getUniqueId().toString()).gameUUID).crimPlayers.contains(mc)){
+                                                        return;
+                                                    }
+                                                }
 
                                                 if (!ent.isDead()) {
                                                     int ping = (((CraftPlayer) Bukkit.getPlayer(playerUUID)).getHandle().ping);
@@ -459,19 +500,37 @@ public class gun implements Cloneable {
                                                             if (head.contains(ray.getPos()) || ray.intersects(head, 100, .05, w, p)) {
                                                                 if (ray.getWalls() > 0) {
                                                                     if(ent.getDisplayName().equals("Bot")){
-                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damage) * 2 * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                        if(mc.headArmor){
+                                                                            damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageHeadArmor) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                        }
+                                                                        else damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageHead) * (Math.pow(.5, ray.getWalls()))) - fallOff));
                                                                     }
                                                                     else {
-                                                                        ((LivingEntity) ent).damage(((((damage) * 2 * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5));
-                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damage) * 2 * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                        if(mc.headArmor){
+                                                                            ((LivingEntity) ent).damage(((((damageHeadArmor) * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5));
+                                                                            damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageHeadArmor) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                        }
+                                                                        else {
+                                                                            ((LivingEntity) ent).damage(((((damageHead)* (Math.pow(.5, ray.getWalls()))) - fallOff) / 5));
+                                                                            damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageHead) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                        }
                                                                     }
                                                                 } else {
                                                                     if(ent.getDisplayName().equals("Bot")){
-                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (((damage) * 2) - fallOff)));
+                                                                        if(mc.headArmor){
+                                                                            damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (((damageHeadArmor)) - fallOff)));
+                                                                        }
+                                                                        else damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (((damageHead)) - fallOff)));
                                                                     }
                                                                     else {
-                                                                        ((LivingEntity) ent).damage((((damage) * 2) - fallOff) / 5);
-                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (((damage) * 2) - fallOff)));
+                                                                        if(mc.headArmor){
+                                                                            ((LivingEntity) ent).damage((((damageHeadArmor)) - fallOff) / 5);
+                                                                            damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (((damageHeadArmor)) - fallOff)));
+                                                                        }
+                                                                        else {
+                                                                            ((LivingEntity) ent).damage((((damageHead)) - fallOff) / 5);
+                                                                            damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (((damageHead)) - fallOff)));
+                                                                        }
                                                                     }
                                                                 }
 
@@ -482,19 +541,35 @@ public class gun implements Cloneable {
                                                             } else {
                                                                 if (ray.getWalls() > 0) {
                                                                     if(ent.getDisplayName().equals("Bot")){
-                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damage) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                        if(mc.bodyArmor) {
+                                                                            damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageBodyArmor) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                        }
+                                                                        else damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageBody) * (Math.pow(.5, ray.getWalls()))) - fallOff));
                                                                     }
                                                                     else {
-                                                                        ((LivingEntity) ent).damage((((damage) * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5);
-                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damage) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                        if(mc.bodyArmor) {
+                                                                            ((LivingEntity) ent).damage((((damageBodyArmor) * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5);
+                                                                            damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageBodyArmor) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                        }
+                                                                        else {
+                                                                            ((LivingEntity) ent).damage((((damageBody) * (Math.pow(.5, ray.getWalls()))) - fallOff) / 5);
+                                                                            damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, (float) (((damageBody) * (Math.pow(.5, ray.getWalls()))) - fallOff));
+                                                                        }
                                                                     }
                                                                 } else {
                                                                     if(ent.getDisplayName().equals("Bot")){
-                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damage - fallOff)));
+                                                                        if(mc.bodyArmor) damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damageBodyArmor - fallOff)));
+                                                                        else damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damageBody - fallOff)));
                                                                     }
                                                                     else {
-                                                                        ((LivingEntity) ent).damage((((damage)) - fallOff) / 5);
-                                                                        damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damage - fallOff)));
+                                                                        if(mc.bodyArmor) {
+                                                                            ((LivingEntity) ent).damage((((damageBodyArmor)) - fallOff) / 5);
+                                                                            damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damageBodyArmor - fallOff)));
+                                                                        }
+                                                                        else {
+                                                                            ((LivingEntity) ent).damage((((damageBody)) - fallOff) / 5);
+                                                                            damageEvent.damageMarker(ent.getLocation(), ((CraftWorld) w).getHandle(), p, ((float) (damageBody - fallOff)));
+                                                                        }
                                                                     }
                                                                 }
                                                                 ent.setNoDamageTicks(0);
@@ -512,6 +587,7 @@ public class gun implements Cloneable {
                                                                 killer.killStreak++;
                                                                 killer.lobbysb.update();
                                                                 killer.gamesb.update();
+                                                                killer.money+=moneyPerKill;
                                                                 if (!ents.contains(ent)) ents.add(ent);
                                                                 if (mc.blind) blind[1] = true;
                                                                 if (ray.isThroughSmoke()) smoke[0] = true;
@@ -542,7 +618,7 @@ public class gun implements Cloneable {
                             for (Player ent : ents) {
                                 ents.remove(ent);
                                 Player p = Bukkit.getPlayer(playerUUID);
-                                String deathMsg = ChatColor.AQUA + Bukkit.getPlayer(playerUUID).getDisplayName() + " ";
+                                String deathMsg = ChatColor.DARK_AQUA + Bukkit.getPlayer(playerUUID).getDisplayName() + " ";
                                 if (blind[0]) deathMsg = deathMsg.concat(ChatColor.WHITE + "鈃");
                                 if ((gunImg.equals("銄銅") || gunImg.equals("銘銙")) && snipeState == 0)
                                     deathMsg = deathMsg.concat(ChatColor.WHITE + "鈄");
@@ -626,11 +702,11 @@ public class gun implements Cloneable {
     public void setFireRate(int fireRate) {
         this.fireRate = fireRate;
     }
-    public float getDamage() {
-        return damage;
+    public float getDamageBody() {
+        return damageBody;
     }
-    public void setDamage(float damage) {
-        this.damage = damage;
+    public void setDamageBody(float damage) {
+        this.damageBody = damage;
     }
     public int getMaxAmmo() {
         return maxAmmo;
@@ -678,4 +754,3 @@ public class gun implements Cloneable {
         isReloading = s;
     }
 }
-

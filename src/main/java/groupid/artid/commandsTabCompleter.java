@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class commandsTabCompleter implements TabCompleter {
-    private static final String[] COMMANDS = { "hub","ping", "bot", "delbot"};
+    private static final String[] COMMANDS = { "hub","ping", "bot", "delbot", "ready"};
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
         final List<String> completions = new ArrayList<>();
